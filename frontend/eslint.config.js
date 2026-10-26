@@ -26,7 +26,7 @@ export default defineConfig([
       "eol-last": ["error", "always"],
       "semi": ["error", "always"],
       "eqeqeq": ["error", "always"],
-      "no-console": ["error", { allow: ["warn", "error"] }],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
       "comma-dangle": ["error", "always-multiline"],
       "quotes": ["error", "single", { avoidEscape: true }],
       "padding-line-between-statements": [

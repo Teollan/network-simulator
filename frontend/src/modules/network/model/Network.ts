@@ -1,10 +1,10 @@
-import { NetworkEdge } from '@/modules/network/model/NetworkEdge';
+import { NetworkConnection } from '@/modules/network/model/NetworkConnection';
 import { NetworkNode } from '@/modules/network/model/NetworkNode';
 import { shuffle } from '@/modules/util/shuffle';
 
 export class Network {
   nodes: NetworkNode[] = [];
-  edges: NetworkEdge[] = [];
+  connections: NetworkConnection[] = [];
 
   spawn(count: number, region: string) {
     this.nodes.push(
@@ -32,14 +32,14 @@ export class Network {
       vertexSet[sequenceItem] += 1;
     }
 
-    const treeEdges: NetworkEdge[] = [];
+    const treeEdges: NetworkConnection[] = [];
 
     for (const sequenceItem of pruferSequence) {
       for (let j = 0; j < nodes.length; j++) {
         if (vertexSet[j] === 0) {
           vertexSet[j] = -1;
 
-          treeEdges.push(new NetworkEdge(nodes[j].id, nodes[sequenceItem].id));
+          treeEdges.push(new NetworkConnection(nodes[j].id, nodes[sequenceItem].id));
 
           vertexSet[sequenceItem]--;
 
@@ -58,7 +58,7 @@ export class Network {
       if (x === null) {
         x = nodes[i];
       } else {
-        treeEdges.push(new NetworkEdge(x.id, nodes[i].id));
+        treeEdges.push(new NetworkConnection(x.id, nodes[i].id));
       }
     }
 
@@ -89,8 +89,8 @@ export class Network {
 
     const tagOnEdges = shuffle(unusedPairs)
       .slice(0, Math.max(0, expectedEdgesCount - treeEdges.length))
-      .map(([sourceId, targetId]) => new NetworkEdge(sourceId, targetId));
+      .map(([sourceId, targetId]) => new NetworkConnection(sourceId, targetId));
 
-    this.edges.push(...treeEdges, ...tagOnEdges);
+    this.connections.push(...treeEdges, ...tagOnEdges);
   }
 }
