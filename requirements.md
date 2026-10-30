@@ -9,15 +9,15 @@ Model:
 []: workstation-router links have their own params (ground type, weight, bandwidth, p_bit)
 []: Types of connections: ground, satellite (satellite = higher latency + error probability, used between regional networks)
 []: routers are located at 2D plane coordinates (used for layout and "most distant workstations")
-[]: nodes can be connected into regional networks
+[x]: nodes can be connected into regional networks
 []: routing algo is the same for all networks
-[]: connections between nodes have a weight, that has to be configured during model creation
+[x]: connections between nodes have a weight, that has to be configured during model creation
 []: weight = routing cost only (input for Dijkstra etc.); timing comes from separate per-link params (bandwidth, propagation delay)
 []: weight must be monotonic with latency for a reference packet size: smaller weight => smaller latency (generator must keep this, e.g. satellite links get weights from the high end of the set)
 []: per-link attributes: type (ground/satellite), duplex | half-duplex, weight, p_bit (per-bit error probability), buffer size
 []: weight generation policy: random in range | constant from set
 []: nodes have IPv4 addresses as labels only (no aggregation/subnetting logic)
-[]: messages can be of varying length
+[x]: messages can be of varying length
 []: buffers are per outgoing link (output queues, needed for a*queue_len); size configurable per node (default for its links) with per-link override
 []: buffer size generation policy: random in range | constant from set
 []: buffer overflow: packet dropped, counted as lost
@@ -25,9 +25,9 @@ Model:
 Topology generator:
 []: random generation with configurable policies (weights, buffers, half-duplex share, p_bit)
 []: variant 6 preset: 3 regional networks x >= 9 routers, average degree 3.5
-[]: weights from set {3, 5, 7, 8, 11, 12, 15, 18, 21, 25}
+[x]: weights from set {3, 5, 7, 8, 11, 12, 15, 18, 21, 25}
 []: links between regional networks are satellite links
-[]: generated graph must be connected
+[x]: generated graph must be connected
 
 Time & traffic model (all params configurable in UI + scenario config, with defaults; values saved in the simulation record):
 []: per-hop delay: t_hop = (header + payload)/bandwidth + propagation + queueing + processing
@@ -52,7 +52,7 @@ Transmission modes:
 
 Routing (local adaptive = backward learning):
 []: nodes never exchange routing info; they learn only from packets passing through
-[]: packets carry source, accumulated cost and hop count
+[x]: packets carry source, accumulated cost and hop count
 []: on receiving a packet from S on line X: record "S reachable via X at cost c / h hops" (learning in reverse direction, assumes symmetric links)
 []: table destinations = workstations (only traffic sources get learned; Task 2 tables are routes to workstations)
 []: per node table: destination -> per outgoing line latest learned cost + hop count + timestamp (gives both Task 2 tables: by weight and by hops)
@@ -63,13 +63,14 @@ Routing (local adaptive = backward learning):
     - hot potato (shortest queue): TTL
 []: datagram mode: bootstrap only while destination is unknown, then learned forwarding
 []: bootstrap copies (flood duplicates etc.) are counted as control traffic
-[]: loop protection: TTL + don't send back on the incoming line
+[x]: loop protection: TTL + don't send back on the incoming line
 []: table entry aging: entries expire after configurable time, so failures/congestion get unlearned
 []: reference: offline Dijkstra (by weight) + BFS (by hops) for comparison only, not used for forwarding
 []: metric: fraction of table entries matching the reference vs number of messages passed (convergence)
 
 Simulation:
-[]: simulate communication between nodes
+[]: Discrete Event Simulation DES 
+[x]: simulate communication between nodes
 []: simulate routing with local adaptive routing (backward learning, see Routing section)
 []: traffic: random traffic generator: arrival process (e.g. Poisson with rate lambda), message size distribution, src/dst selection (e.g. uniform over workstation pairs)
 []: traffic: manual "send N bytes from workstation A to B" (UI + scenario events)
@@ -105,7 +106,7 @@ Tooling:
 [] Command line tool to run scenario files
 
 Visualization:
-[]: Web app (React.js)
+[x]: Web app (React.js)
 []: Visible connections between nodes with indications of packets traveling through them
 []: Connection heatmap: green-to-red gradient by link utilisation / queue fill
 []: Ability to setup, run the simulation and see the result

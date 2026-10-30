@@ -1,4 +1,4 @@
-import { networkConnectionToElkEdge } from '@/modules/layout/model/networkConnectionToElkEdge';
+import { networkLinkToElkEdge } from '@/modules/layout/model/networkLinkToElkEdge';
 import { networkNodeToElkNode } from '@/modules/layout/model/networkNodeToElkNode';
 import type { Network } from '@/modules/network/model/Network';
 import Elk from 'elkjs/lib/elk.bundled.js';
@@ -20,7 +20,7 @@ export const useElkLayout = (network: Network) => {
       id: 'root',
       layoutOptions: ELK_LAYOUT_OPTIONS.STRESS,
       children: network.nodes.map(networkNodeToElkNode),
-      edges: network.connections.map(networkConnectionToElkEdge),
+      edges: network.links.map(networkLinkToElkEdge),
     };
 
     elk.layout(graph)

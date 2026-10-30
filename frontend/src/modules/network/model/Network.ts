@@ -1,10 +1,10 @@
-import { NetworkConnection } from '@/modules/network/model/NetworkConnection';
+import { NetworkLink } from '@/modules/network/model/NetworkLink';
 import { NetworkNode } from '@/modules/network/model/NetworkNode';
 import { shuffle } from '@/modules/util/shuffle';
 
 export class Network {
-  nodes: NetworkNode[] = [];
-  connections: NetworkConnection[] = [];
+  readonly nodes: NetworkNode[] = [];
+  readonly links: NetworkLink[] = [];
 
   spawn(count: number, region: string) {
     this.nodes.push(
@@ -15,7 +15,13 @@ export class Network {
     );
   }
 
-  connect(degree: number, selectorFn: (node: NetworkNode) => boolean) {
+  connect(
+    degree: number,
+    selectorFn: (node: NetworkNode) => boolean,
+    weightPool: number[],
+  ) {
+    const getRandomWeight = () => weightPool[Math.floor(Math.random() * weightPool.length)];
+
     const nodes = this.nodes.filter(selectorFn);
 
     const pruferSequence = Array.from(
@@ -32,14 +38,14 @@ export class Network {
       vertexSet[sequenceItem] += 1;
     }
 
-    const treeEdges: NetworkConnection[] = [];
+    const treeEdges: NetworkLink[] = [];
 
     for (const sequenceItem of pruferSequence) {
       for (let j = 0; j < nodes.length; j++) {
         if (vertexSet[j] === 0) {
           vertexSet[j] = -1;
 
-          treeEdges.push(new NetworkConnection(nodes[j].id, nodes[sequenceItem].id));
+          treeEdges.push(new NetworkLink(nodes[j].id, nodes[sequenceItem].id, getRandomWeight()));
 
           vertexSet[sequenceItem]--;
 
@@ -58,7 +64,7 @@ export class Network {
       if (x === null) {
         x = nodes[i];
       } else {
-        treeEdges.push(new NetworkConnection(x.id, nodes[i].id));
+        treeEdges.push(new NetworkLink(x.id, nodes[i].id, getRandomWeight()));
       }
     }
 
@@ -89,8 +95,25 @@ export class Network {
 
     const tagOnEdges = shuffle(unusedPairs)
       .slice(0, Math.max(0, expectedEdgesCount - treeEdges.length))
-      .map(([sourceId, targetId]) => new NetworkConnection(sourceId, targetId));
+      .map(([sourceId, targetId]) => new NetworkLink(sourceId, targetId, getRandomWeight()));
 
-    this.connections.push(...treeEdges, ...tagOnEdges);
+    this.links.push(...treeEdges, ...tagOnEdges);
+  }
+
+  getAdjacentNodes(nodeId: number): NetworkNode[] {
+    const links = this.links.filter((link) => link.doesLink(nodeId));
+
+    const neighborIds = links.map((link) => link.getComplement(nodeId));
+
+    return this.nodes.filter(({ id }) => neighborIds.includes(id));
+  }
+
+  getLinkBetween(a: number, b: number): NetworkLink | null {
+    return this.links.find((link) => {
+      const isDirect = link.sourceId === a && link.targetId === b;
+      const isReverse = link.sourceId === b && link.targetId === a;
+
+      return isDirect || isReverse;
+    }) ?? null;
   }
 }

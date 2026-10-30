@@ -15,15 +15,36 @@ import FloatingEdge from '@/modules/network/view/FloatingEdge';
 import { CustomNode } from '@/modules/network/view/CustomNode';
 import { useElkLayout } from '@/modules/layout/view/useElkLayout';
 import { networkNodeToFlowNode } from '@/modules/graph/model/networkNodeToFlowNode';
-import { networkConnectionToFlowEdge } from '@/modules/graph/model/networkConnectionToFlowEdge';
+import { networkLinkToFlowEdge } from '@/modules/graph/model/networkLinkToFlowEdge';
 import { EDGE_TYPE, NODE_TYPE } from '@/modules/graph/view/graph.constants';
+import { Simulation } from '@/modules/simulation/model/Simulation';
+import { SIMULATION_EVENT_KIND } from '@/modules/simulation/model/SimulationEvent';
+import { HotPotatoRP } from '@/modules/routing/model/HotPotatoRP';
 
 const network = new Network();
 
 network.spawn(9, 'us');
-network.connect(3.5, (node) => node.label.includes('us'));
+network.connect(
+  2.5,
+  (node) => node.label.includes('us'),
+  [3, 5, 7, 8, 11, 12, 15, 18, 21, 25],
+);
 
-const initialEdges = network.connections.map(networkConnectionToFlowEdge);
+const simulation = new Simulation(network, new HotPotatoRP());
+
+simulation.schedule({
+  kind: SIMULATION_EVENT_KIND.MESSAGE_SENT,
+  data: {
+    fromNodeId: 1,
+    toNodeId: 9,
+    message: { id: 1, length: 10 },
+  },
+  time: 0,
+});
+
+simulation.run();
+
+const initialEdges = network.links.map(networkLinkToFlowEdge);
 
 const NODE_TYPES = {
   [NODE_TYPE.ROUTER]: CustomNode,
