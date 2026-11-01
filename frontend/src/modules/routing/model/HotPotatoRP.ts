@@ -1,34 +1,36 @@
 import type { NetworkFrame } from '@/modules/network/model/NetworkFrame';
 import type { NetworkNode } from '@/modules/network/model/NetworkNode';
 import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/model/RoutingPolicy';
-import type { SimulationNodeState } from '@/modules/simulation/model/SimulationNodeState';
+import { shuffle } from '@/modules/util/shuffle';
 
-// TODO: *IT IS BROKEN* 
-// i'll fix it later
-// gets lost when hitting a dead end during a random walk
-export class HotPotatoRP implements RoutingPolicy<SimulationNodeState> {
-  initState(node: NetworkNode, _ctx: RoutingPolicyContext): SimulationNodeState {
-    return { model: node };
+export class HotPotatoRP implements RoutingPolicy<null> {
+  initState(_: NetworkNode, __: RoutingPolicyContext): null {
+    return null;
   }
 
-  onPacket(state: SimulationNodeState, frame: NetworkFrame, ctx: RoutingPolicyContext) {
+  onPacket(_: null, frame: NetworkFrame, ctx: RoutingPolicyContext) {
     const senderId = frame.sourceId;
     const receiverId = frame.destinationId;
 
-    const targets = ctx.network
+    const targetIds = ctx.network
       .getAdjacentNodes(receiverId)
-      .filter((node) => node.id !== senderId);
+      .map((node) => node.id)
+      .filter((id) => id !== senderId);
 
-    if (!targets.length) {
+    if (!targetIds.length) {
       return {
-        state: {
-          ...state,
-        },
-        destinationIds: [],
+        state: null,
+        destinationIds: [senderId],
       };
     }
 
-    // a busy link has one more frame on the wire ahead of the queue
+    if (targetIds.includes(frame.packet.destinationId)) {
+      return {
+        state: null,
+        destinationIds: [frame.packet.destinationId],
+      };
+    }
+
     const getBufferLength = (targetId: number) => {
       const link = ctx.network.getLinkBetween(receiverId, targetId);
       const linkState = link && ctx.linkStatesByLinkId.get(link.id);
@@ -40,15 +42,13 @@ export class HotPotatoRP implements RoutingPolicy<SimulationNodeState> {
       return linkState.queue.length + (linkState.isBusy ? 1 : 0);
     };
 
-    const targetWithSmallestBuffer = targets.sort((a, b) => (
-      getBufferLength(a.id) - getBufferLength(b.id)
+    const targetWithSmallestBufferId = shuffle(targetIds).sort((a, b) => (
+      getBufferLength(a) - getBufferLength(b)
     ))[0];
 
     return {
-      state: {
-        ...state,
-      },
-      destinationIds: [targetWithSmallestBuffer.id],
+      state: null,
+      destinationIds: [targetWithSmallestBufferId],
     };
   }
 };

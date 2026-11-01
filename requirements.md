@@ -30,8 +30,8 @@ Topology generator:
 [x]: generated graph must be connected
 
 Time & traffic model (all params configurable in UI + scenario config, with defaults; values saved in the simulation record):
-[]: per-hop delay: t_hop = (header + payload)/bandwidth + propagation + queueing + processing
-[]: half-duplex links: one direction at a time, other side waits in queue
+[x]: per-hop delay: t_hop = (header + payload)/bandwidth + propagation + queueing + processing
+[x]: half-duplex links: one direction at a time, other side waits in queue
 []: bandwidth derived from weight (e.g. bandwidth = K/weight) to keep weight monotonic with latency; propagation per link type (ground ~ms, satellite ~250 ms)
 []: packet formats (bytes): data header, ACK, NACK, VC setup/confirm/teardown; payload size sweep range (e.g. 64 B .. 4 KB)
 []: control packets (ACK, setup, flood copies...) occupy links and queues like data packets
@@ -39,7 +39,7 @@ Time & traffic model (all params configurable in UI + scenario config, with defa
 []: ACK policy: hop-by-hop | end-to-end (selectable per transmission mode)
 []: retransmission timeout: fixed initial value, then adapted from measured RTT (avoid spurious retx on satellite hops) | fixed value
 []: retry limit, after which the message is counted as failed
-[]: processing delay per node (constant)
+[x]: processing delay per node (constant)
 
 Transmission modes:
 []: virtual circuit: setup (request/confirm) -> data over fixed path -> teardown
@@ -69,7 +69,7 @@ Routing (local adaptive = backward learning):
 []: metric: fraction of table entries matching the reference vs number of messages passed (convergence)
 
 Simulation:
-[]: Discrete Event Simulation DES 
+[x]: Discrete Event Simulation DES 
 [x]: simulate communication between nodes
 []: simulate routing with local adaptive routing (backward learning, see Routing section)
 []: traffic: random traffic generator: arrival process (e.g. Poisson with rate lambda), message size distribution, src/dst selection (e.g. uniform over workstation pairs)

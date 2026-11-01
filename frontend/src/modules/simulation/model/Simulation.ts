@@ -10,7 +10,6 @@ import {
   type PacketDropReason,
   type SimulationEvent,
 } from '@/modules/simulation/model/SimulationEvent';
-import type { SimulationNodeState } from '@/modules/simulation/model/SimulationNodeState';
 import { PriorityQueue } from '@/modules/util/PriorityQueue/PriorityQueue';
 
 const MAX_PACKET_LENGTH = 10;
@@ -20,9 +19,9 @@ const BANDWIDTH_FACTOR = 10;
 const GROUND_PROPAGATION_DELAY = 1;
 const PROCESSING_DELAY = 1;
 
-export interface SimulationOptions<NS extends SimulationNodeState> {
+export interface SimulationOptions<T> {
   network: Network;
-  routingPolicy: RoutingPolicy<NS>;
+  routingPolicy: RoutingPolicy<T>;
 }
 
 type ScheduledSimulationEvent = SimulationEvent & { seq: number };
@@ -31,17 +30,17 @@ const byTimeThenSeq = (a: ScheduledSimulationEvent, b: ScheduledSimulationEvent)
   a.time < b.time || (a.time === b.time && a.seq < b.seq)
 );
 
-export class Simulation<NS extends SimulationNodeState> {
+export class Simulation<T> {
   private events = new PriorityQueue<ScheduledSimulationEvent>(byTimeThenSeq);
   private nextSeq = 0;
   private clock = 0;
-  private nodeStatesByNodeId = new Map<number, NS>;
+  private nodeStatesByNodeId = new Map<number, T>;
   private linkStatesByLinkId = new Map<number, SimulationLinkState>;
 
   readonly network: Network;
-  readonly routingPolicy: RoutingPolicy<NS>;
+  readonly routingPolicy: RoutingPolicy<T>;
 
-  constructor(network: Network, routingPolicy: RoutingPolicy<NS>) {
+  constructor(network: Network, routingPolicy: RoutingPolicy<T>) {
     this.network = network;
     this.routingPolicy = routingPolicy;
 
@@ -169,8 +168,8 @@ export class Simulation<NS extends SimulationNodeState> {
     const { packet } = data;
     const state = this.nodeStatesByNodeId.get(packet.sourceId);
 
-    if (!state) {
-      return;
+    if (state === undefined) {
+      throw Error('The router state is undefined!');
     }
 
     const result = this.routingPolicy.onPacket(
@@ -216,7 +215,7 @@ export class Simulation<NS extends SimulationNodeState> {
     const state = this.linkStatesByLinkId.get(link.id);
 
     if (!state) {
-      return;
+      throw Error('Link state is undefined!');
     }
 
     this.transmitNext(link, state);
@@ -227,8 +226,8 @@ export class Simulation<NS extends SimulationNodeState> {
     const { packet } = frame;
     const state = this.nodeStatesByNodeId.get(frame.destinationId);
 
-    if (!state) {
-      return;
+    if (state === undefined) {
+      throw Error('Routing State is undefined!');
     }
 
     if (packet.destinationId === frame.destinationId) {
