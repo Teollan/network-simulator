@@ -7,7 +7,6 @@ export const SIMULATION_EVENT_KIND = {
   MESSAGE_RECEIVED: 'message::received',
 
   PACKET_CREATED: 'packet::created',
-  PACKET_ENQUEUED: 'packet::enqueued',
   PACKET_SENT: 'packet::sent',
   PACKET_RECEIVED: 'packet::received',
   PACKET_DROPPED: 'packet::dropped',
@@ -34,9 +33,6 @@ export type SimulationEventData<K extends SimulationEventKind> = {
   };
   [SIMULATION_EVENT_KIND.PACKET_CREATED]: {
     packet: NetworkPacket;
-  };
-  [SIMULATION_EVENT_KIND.PACKET_ENQUEUED]: {
-    frame: NetworkFrame;
   };
   [SIMULATION_EVENT_KIND.PACKET_SENT]: {
     frame: NetworkFrame;
