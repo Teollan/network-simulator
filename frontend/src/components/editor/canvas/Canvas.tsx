@@ -63,7 +63,10 @@ const CanvasFlow = () => {
     <div className="relative size-full">
       {isGenerating && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60">
-          <LoaderCircle className="size-6 animate-spin text-muted-foreground" aria-label="Generating network" />
+          <LoaderCircle
+            className="size-6 animate-spin text-muted-foreground"
+            aria-label="Generating network"
+          />
         </div>
       )}
 
@@ -78,6 +81,7 @@ const CanvasFlow = () => {
         fitView
       >
         <Background />
+
         <Controls />
       </ReactFlow>
     </div>

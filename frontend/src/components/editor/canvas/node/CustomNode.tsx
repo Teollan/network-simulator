@@ -14,9 +14,13 @@ export const CustomNode = memo(({ data }: CustomNodeProps) => {
         isConnectable={false}
         style={{ border: 'none', background: 'none', pointerEvents: 'none' }}
       />
+
       < div className='my-div'>
-        <div>{data.label}</div>
+        <div>
+          {data.label}
+        </div>
       </div >
+
       <Handle
         type="source"
         position={Position.Right}

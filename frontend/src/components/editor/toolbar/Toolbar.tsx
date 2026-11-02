@@ -10,7 +10,12 @@ export const Toolbar = () => {
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-background px-3">
-      <Button variant="outline" size="sm" onClick={generateNetwork} disabled={isGenerating}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={generateNetwork}
+        disabled={isGenerating}
+      >
         <RefreshCw />
         Generate
       </Button>
@@ -20,39 +25,74 @@ export const Toolbar = () => {
         Run
       </Button>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator
+        orientation="vertical"
+        className="mx-1 h-6"
+      />
 
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon-sm" aria-label="Jump to start" title="Jump to start">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Jump to start"
+          title="Jump to start"
+        >
           <SkipBack />
         </Button>
 
-        <Button variant="ghost" size="icon-sm" aria-label="Previous event" title="Previous event">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Previous event"
+          title="Previous event"
+        >
           <StepBack />
         </Button>
 
-        <Button variant="ghost" size="icon-sm" aria-label="Play" title="Play">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Play"
+          title="Play"
+        >
           <Play />
         </Button>
 
-        <Button variant="ghost" size="icon-sm" aria-label="Next event" title="Next event">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Next event"
+          title="Next event"
+        >
           <StepForward />
         </Button>
 
-        <Button variant="ghost" size="icon-sm" aria-label="Jump to end" title="Jump to end">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Jump to end"
+          title="Jump to end"
+        >
           <SkipForward />
         </Button>
       </div>
 
       <Select defaultValue={`${DEFAULT_PLAYBACK_SPEED}`}>
-        <SelectTrigger size="sm" className="w-20" aria-label="Playback speed">
+        <SelectTrigger
+          size="sm"
+          className="w-20"
+          aria-label="Playback speed"
+        >
           <SelectValue />
         </SelectTrigger>
 
         <SelectContent>
           {PLAYBACK_SPEEDS.map((speed) => (
-            <SelectItem key={speed} value={`${speed}`}>
-              {speed}×
+            <SelectItem
+              key={speed}
+              value={`${speed}`}
+            >
+              {`${speed}×`}
             </SelectItem>
           ))}
         </SelectContent>

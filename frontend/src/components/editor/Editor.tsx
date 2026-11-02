@@ -5,8 +5,15 @@ import { Toolbar } from '@/components/editor/toolbar/Toolbar';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/Resizable';
 
 export const Editor = () => (
-  <ResizablePanelGroup orientation="horizontal" className="h-full">
-    <ResizablePanel defaultSize="360px" minSize="280px" maxSize="50%">
+  <ResizablePanelGroup
+    orientation="horizontal"
+    className="h-full"
+  >
+    <ResizablePanel
+      defaultSize="360px"
+      minSize="280px"
+      maxSize="50%"
+    >
       <Aside />
     </ResizablePanel>
 

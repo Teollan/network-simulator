@@ -6,7 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 export const Aside = () => (
   <aside className="flex h-full flex-col bg-background">
-    <Tabs defaultValue={ASIDE_TAB.NETWORK} className="h-full gap-0">
+    <Tabs
+      defaultValue={ASIDE_TAB.NETWORK}
+      className="h-full gap-0"
+    >
       <div className="border-b p-2">
         <TabsList className="w-full">
           <TabsTrigger value={ASIDE_TAB.NETWORK}>
@@ -23,15 +26,24 @@ export const Aside = () => (
         </TabsList>
       </div>
 
-      <TabsContent value={ASIDE_TAB.NETWORK} className="overflow-y-auto p-4">
+      <TabsContent
+        value={ASIDE_TAB.NETWORK}
+        className="overflow-y-auto p-4"
+      >
         <NetworkTab />
       </TabsContent>
 
-      <TabsContent value={ASIDE_TAB.SIMULATION} className="overflow-y-auto p-4">
+      <TabsContent
+        value={ASIDE_TAB.SIMULATION}
+        className="overflow-y-auto p-4"
+      >
         <SimulationTab />
       </TabsContent>
 
-      <TabsContent value={ASIDE_TAB.TRACE} className="overflow-y-auto p-4">
+      <TabsContent
+        value={ASIDE_TAB.TRACE}
+        className="overflow-y-auto p-4"
+      >
         <TraceTab />
       </TabsContent>
     </Tabs>

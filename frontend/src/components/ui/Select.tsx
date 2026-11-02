@@ -6,7 +6,12 @@ import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from 'lucide-react';
 function Select({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />;
+  return (
+    <SelectPrimitive.Root
+      data-slot="select"
+      {...props}
+    />
+  );
 }
 
 function SelectGroup({
@@ -25,7 +30,12 @@ function SelectGroup({
 function SelectValue({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />;
+  return (
+    <SelectPrimitive.Value
+      data-slot="select-value"
+      {...props}
+    />
+  );
 }
 
 function SelectTrigger({
@@ -47,6 +57,7 @@ function SelectTrigger({
       {...props}
     >
       {children}
+
       <SelectPrimitive.Icon asChild>
         <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />
       </SelectPrimitive.Icon>
@@ -72,6 +83,7 @@ function SelectContent({
         {...props}
       >
         <SelectScrollUpButton />
+
         <SelectPrimitive.Viewport
           data-position={position}
           className={cn(
@@ -81,6 +93,7 @@ function SelectContent({
         >
           {children}
         </SelectPrimitive.Viewport>
+
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
@@ -119,7 +132,10 @@ function SelectItem({
           <CheckIcon className="pointer-events-none" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+
+      <SelectPrimitive.ItemText>
+        {children}
+      </SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   );
 }
@@ -150,8 +166,7 @@ function SelectScrollUpButton({
       )}
       {...props}
     >
-      <ChevronUpIcon
-      />
+      <ChevronUpIcon />
     </SelectPrimitive.ScrollUpButton>
   );
 }
@@ -169,8 +184,7 @@ function SelectScrollDownButton({
       )}
       {...props}
     >
-      <ChevronDownIcon
-      />
+      <ChevronDownIcon />
     </SelectPrimitive.ScrollDownButton>
   );
 }

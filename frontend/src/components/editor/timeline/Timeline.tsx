@@ -6,7 +6,13 @@ export const Timeline = () => (
       0.00
     </span>
 
-    <Slider defaultValue={[0]} min={0} max={100} step={0.01} aria-label="Simulation time" />
+    <Slider
+      defaultValue={[0]}
+      min={0}
+      max={100}
+      step={0.01}
+      aria-label="Simulation time"
+    />
 
     <span className="w-16 text-right font-mono text-xs tabular-nums text-muted-foreground">
       0.00

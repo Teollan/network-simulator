@@ -33,7 +33,10 @@ export const NetworkTab = () => {
       description="Topology generation: routers per region, average degree and link weights."
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="routers-per-region">Routers per region</Label>
+        <Label htmlFor="routers-per-region">
+          Routers per region
+        </Label>
+
         <Input
           id="routers-per-region"
           type="number"
@@ -45,7 +48,10 @@ export const NetworkTab = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="average-degree">Average degree</Label>
+        <Label htmlFor="average-degree">
+          Average degree
+        </Label>
+
         <Input
           id="average-degree"
           type="number"
@@ -57,19 +63,25 @@ export const NetworkTab = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Link weights</Label>
+        <Label>
+          Link weights
+        </Label>
+
         <p className="text-sm text-muted-foreground">
           {networkConfig.weightPool.join(', ')}
         </p>
       </div>
 
-      <Button onClick={generateNetwork} disabled={isGenerating}>
+      <Button
+        onClick={generateNetwork}
+        disabled={isGenerating}
+      >
         <RefreshCw />
         Generate
       </Button>
 
       <p className="text-xs text-muted-foreground">
-        {nodeCount} routers · {linkCount} links · degree {actualDegree.toFixed(2)}
+        {`${nodeCount} routers · ${linkCount} links · degree ${actualDegree.toFixed(2)}`}
       </p>
     </AsideSection>
   );
