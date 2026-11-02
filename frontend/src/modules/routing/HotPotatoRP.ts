@@ -1,6 +1,6 @@
-import type { NetworkFrame } from '@/modules/network/model/NetworkFrame';
-import type { NetworkNode } from '@/modules/network/model/NetworkNode';
-import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/model/RoutingPolicy';
+import type { NetworkFrame } from '@/modules/network/NetworkFrame';
+import type { NetworkNode } from '@/modules/network/NetworkNode';
+import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/RoutingPolicy';
 import { shuffle } from '@/modules/util/shuffle';
 
 export class HotPotatoRP implements RoutingPolicy<null> {

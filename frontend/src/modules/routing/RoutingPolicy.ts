@@ -1,7 +1,7 @@
-import type { Network } from '@/modules/network/model/Network';
-import type { NetworkFrame } from '@/modules/network/model/NetworkFrame';
-import type { NetworkNode } from '@/modules/network/model/NetworkNode';
-import type { SimulationLinkState } from '@/modules/simulation/model/SimulationLinkState';
+import type { Network } from '@/modules/network/Network';
+import type { NetworkFrame } from '@/modules/network/NetworkFrame';
+import type { NetworkNode } from '@/modules/network/NetworkNode';
+import type { SimulationLinkState } from '@/modules/simulation/SimulationLinkState';
 
 export interface RoutingPolicyContext {
   readonly network: Network;

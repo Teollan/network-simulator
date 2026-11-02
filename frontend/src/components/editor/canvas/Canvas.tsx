@@ -10,16 +10,17 @@ import {
   type Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Network } from '@/modules/network/model/Network';
-import FloatingEdge from '@/modules/network/view/FloatingEdge';
-import { CustomNode } from '@/modules/network/view/CustomNode';
+import { Network } from '@/modules/network/Network';
+import FloatingEdge from '@/components/editor/canvas/edge/FloatingEdge';
+import { CustomNode } from '@/components/editor/canvas/node/CustomNode';
 import { useElkLayout } from '@/modules/layout/view/useElkLayout';
 import { networkNodeToFlowNode } from '@/modules/graph/model/networkNodeToFlowNode';
 import { networkLinkToFlowEdge } from '@/modules/graph/model/networkLinkToFlowEdge';
-import { EDGE_TYPE, NODE_TYPE } from '@/modules/graph/view/graph.constants';
-import { Simulation } from '@/modules/simulation/model/Simulation';
-import { SIMULATION_EVENT_KIND } from '@/modules/simulation/model/SimulationEvent';
-import { HotPotatoRP } from '@/modules/routing/model/HotPotatoRP';
+import { Simulation } from '@/modules/simulation/Simulation';
+import { SIMULATION_EVENT_KIND } from '@/modules/simulation/SimulationEvent';
+import { HotPotatoRP } from '@/modules/routing/HotPotatoRP';
+import { NODE_TYPE } from '@/components/editor/canvas/node/node.constants';
+import { EDGE_TYPE } from '@/components/editor/canvas/edge/edge.constants';
 
 const network = new Network();
 
@@ -54,7 +55,7 @@ const EDGE_TYPES = {
   [EDGE_TYPE.GROUND_CONNECTION]: FloatingEdge,
 };
 
-export const GraphPaper = () => {
+export const Canvas = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 

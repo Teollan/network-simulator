@@ -1,6 +1,6 @@
-import type { NetworkFrame } from '@/modules/network/model/NetworkFrame';
-import type { NetworkMessage } from '@/modules/network/model/NetworkMessage';
-import type { NetworkPacket } from '@/modules/network/model/NetworkPacket';
+import type { NetworkFrame } from '@/modules/network/NetworkFrame';
+import type { NetworkMessage } from '@/modules/network/NetworkMessage';
+import type { NetworkPacket } from '@/modules/network/NetworkPacket';
 
 export const SIMULATION_EVENT_KIND = {
   MESSAGE_SENT: 'message::sent',

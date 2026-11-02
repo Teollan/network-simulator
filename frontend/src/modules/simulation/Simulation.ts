@@ -1,15 +1,15 @@
-import type { Network } from '@/modules/network/model/Network';
-import type { NetworkFrame } from '@/modules/network/model/NetworkFrame';
-import type { NetworkLink } from '@/modules/network/model/NetworkLink';
-import { NetworkPacket } from '@/modules/network/model/NetworkPacket';
-import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/model/RoutingPolicy';
-import type { SimulationLinkState } from '@/modules/simulation/model/SimulationLinkState';
+import type { Network } from '@/modules/network/Network';
+import type { NetworkFrame } from '@/modules/network/NetworkFrame';
+import type { NetworkLink } from '@/modules/network/NetworkLink';
+import { NetworkPacket } from '@/modules/network/NetworkPacket';
+import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/RoutingPolicy';
+import type { SimulationLinkState } from '@/modules/simulation/SimulationLinkState';
 import {
   PACKET_DROP_REASON,
   SIMULATION_EVENT_KIND,
   type PacketDropReason,
   type SimulationEvent,
-} from '@/modules/simulation/model/SimulationEvent';
+} from '@/modules/simulation/SimulationEvent';
 import { PriorityQueue } from '@/modules/util/PriorityQueue/PriorityQueue';
 
 const MAX_PACKET_LENGTH = 10;

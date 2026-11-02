@@ -1,8 +1,8 @@
-import { GraphPaper } from '@/modules/network/view/GraphPaper';
+import { Canvas } from '@/components/editor/canvas/Canvas';
 
 function App() {
   return (
-    <GraphPaper />
+    <Canvas />
   );
 }
 

@@ -1,6 +1,6 @@
 import { networkLinkToElkEdge } from '@/modules/layout/model/networkLinkToElkEdge';
 import { networkNodeToElkNode } from '@/modules/layout/model/networkNodeToElkNode';
-import type { Network } from '@/modules/network/model/Network';
+import type { Network } from '@/modules/network/Network';
 import Elk from 'elkjs/lib/elk.bundled.js';
 import type { ElkNode } from 'elkjs';
 import { useEffect, useState } from 'react';

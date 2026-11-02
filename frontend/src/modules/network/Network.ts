@@ -1,5 +1,5 @@
-import { NetworkLink } from '@/modules/network/model/NetworkLink';
-import { NetworkNode } from '@/modules/network/model/NetworkNode';
+import { NetworkLink } from '@/modules/network/NetworkLink';
+import { NetworkNode } from '@/modules/network/NetworkNode';
 import { shuffle } from '@/modules/util/shuffle';
 
 export class Network {

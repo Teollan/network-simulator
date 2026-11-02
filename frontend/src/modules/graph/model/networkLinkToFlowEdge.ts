@@ -1,5 +1,5 @@
 import { EDGE_TYPE } from '@/modules/graph/view/graph.constants';
-import type { NetworkLink } from '@/modules/network/model/NetworkLink';
+import type { NetworkLink } from '@/modules/network/NetworkLink';
 import type { Edge } from '@xyflow/react';
 
 export const networkLinkToFlowEdge = (connection: NetworkLink): Edge => ({

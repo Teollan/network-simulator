@@ -1,4 +1,4 @@
-import type { NetworkPacket } from '@/modules/network/model/NetworkPacket';
+import type { NetworkPacket } from '@/modules/network/NetworkPacket';
 
 export interface NetworkFrame {
   packet: NetworkPacket;

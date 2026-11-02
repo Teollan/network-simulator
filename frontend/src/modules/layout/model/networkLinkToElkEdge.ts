@@ -1,4 +1,4 @@
-import type { NetworkLink } from '@/modules/network/model/NetworkLink';
+import type { NetworkLink } from '@/modules/network/NetworkLink';
 import type { ElkExtendedEdge } from 'elkjs';
 
 export const networkLinkToElkEdge = (connection: NetworkLink): ElkExtendedEdge => ({

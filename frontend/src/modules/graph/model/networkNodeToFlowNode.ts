@@ -1,5 +1,5 @@
 import type { Node as FlowNode, XYPosition } from '@xyflow/react';
-import type { NetworkNode } from '@/modules/network/model/NetworkNode';
+import type { NetworkNode } from '@/modules/network/NetworkNode';
 import { NODE_TYPE } from '@/modules/graph/view/graph.constants';
 
 export const networkNodeToFlowNode = (node: NetworkNode, position: XYPosition): FlowNode => ({
