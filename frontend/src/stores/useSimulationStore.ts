@@ -1,9 +1,11 @@
 import { create } from 'zustand';
+import { toast } from 'sonner';
 import { createRoutingPolicy } from '@/modules/routing/createRoutingPolicy';
 import { ROUTING_POLICY, type RoutingPolicyId } from '@/modules/routing/routing.constants';
 import { Simulation } from '@/modules/simulation/Simulation';
 import { SIMULATION_EVENT_KIND } from '@/modules/simulation/SimulationEvent';
 import { DEFAULT_RUN_UNTIL } from '@/modules/simulation/simulation.constants';
+import { summarizeTrace } from '@/modules/simulation/summarizeTrace';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { useTraceStore } from '@/stores/useTraceStore';
 
@@ -63,5 +65,17 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
     simulation.run(runUntil);
 
     useTraceStore.getState().setEvents(simulation.trace);
+
+    const { eventCount, deliveredCount, droppedCount } = summarizeTrace(simulation.trace);
+    const description = `${eventCount} events · ${deliveredCount} delivered · ${droppedCount} dropped`;
+    const time = simulation.time.toFixed(2);
+
+    if (simulation.pendingEventCount > 0) {
+      toast.info(`Stopped at t = ${time}`, {
+        description: `${description} · ${simulation.pendingEventCount} events still pending`,
+      });
+    } else {
+      toast.success(`Simulation finished at t = ${time}`, { description });
+    }
   },
 }));

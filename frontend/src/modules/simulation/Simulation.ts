@@ -62,6 +62,14 @@ export class Simulation<T> {
     };
   }
 
+  get pendingEventCount() {
+    return this.events.length;
+  }
+
+  get time() {
+    return this.clock;
+  }
+
   run(until = Infinity) {
     while (this.events.length > 0) {
       const event = this.events.peek();
