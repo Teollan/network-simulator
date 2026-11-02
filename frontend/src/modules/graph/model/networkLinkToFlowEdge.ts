@@ -1,4 +1,4 @@
-import { EDGE_TYPE } from '@/modules/graph/view/graph.constants';
+import { EDGE_TYPE } from '@/components/editor/canvas/edge/edge.constants';
 import type { NetworkLink } from '@/modules/network/NetworkLink';
 import type { Edge } from '@xyflow/react';
 

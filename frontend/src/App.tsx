@@ -1,8 +1,8 @@
-import { Canvas } from '@/components/editor/canvas/Canvas';
+import { Editor } from '@/components/editor/Editor';
 
 function App() {
   return (
-    <Canvas />
+    <Editor />
   );
 }
 
