@@ -15,16 +15,11 @@ import {
 import '@xyflow/react/dist/style.css';
 import { LoaderCircle } from 'lucide-react';
 import FloatingEdge from '@/components/editor/canvas/edge/FloatingEdge';
-import { CustomNode } from '@/components/editor/canvas/node/CustomNode';
 import { networkNodeToFlowNode } from '@/modules/graph/model/networkNodeToFlowNode';
 import { networkLinkToFlowEdge } from '@/modules/graph/model/networkLinkToFlowEdge';
-import { NODE_TYPE } from '@/components/editor/canvas/node/node.constants';
 import { EDGE_TYPE } from '@/components/editor/canvas/edge/edge.constants';
 import { useNetworkStore } from '@/stores/useNetworkStore';
-
-const NODE_TYPES = {
-  [NODE_TYPE.ROUTER]: CustomNode,
-};
+import { NODE_TYPES } from '@/components/editor/canvas/node/node.constants';
 
 const EDGE_TYPES = {
   [EDGE_TYPE.GROUND_CONNECTION]: FloatingEdge,
@@ -78,6 +73,7 @@ const CanvasFlow = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        colorMode="system"
         fitView
       >
         <Background />
