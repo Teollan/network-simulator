@@ -3,13 +3,14 @@ import type { Network } from '@/modules/network/Network';
 import { generateNetwork, type NetworkConfig } from '@/modules/network/generateNetwork';
 import { DEFAULT_NETWORK_CONFIG } from '@/modules/network/network.constants';
 import { layoutNetwork, type LayoutPositions } from '@/modules/layout/layoutNetwork';
+import { useTraceStore } from '@/stores/useTraceStore';
 
 interface NetworkLayout {
   network: Network;
   positions: LayoutPositions;
 }
 
-interface NetworkState {
+interface NetworkStore {
   networkConfig: NetworkConfig;
   networkLayout: NetworkLayout | null;
   isGenerating: boolean;
@@ -18,7 +19,7 @@ interface NetworkState {
   generateNetwork: () => Promise<void>;
 }
 
-export const useNetworkStore = create<NetworkState>()((set, get) => ({
+export const useNetworkStore = create<NetworkStore>()((set, get) => ({
   networkConfig: DEFAULT_NETWORK_CONFIG,
   networkLayout: null,
   isGenerating: false,
@@ -39,6 +40,8 @@ export const useNetworkStore = create<NetworkState>()((set, get) => ({
       const positions = await layoutNetwork(network);
 
       set({ networkLayout: { network, positions }, isGenerating: false });
+
+      useTraceStore.getState().clearEvents();
     } catch (error) {
       console.error('Network generation failed', error);
 

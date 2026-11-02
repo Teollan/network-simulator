@@ -1,18 +1,10 @@
-import { type ChangeEvent } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { AsideSection } from '@/components/editor/aside/AsideSection';
+import { onNumberChange } from '@/components/editor/aside/onNumberChange';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { useNetworkStore } from '@/stores/useNetworkStore';
-
-const onNumberChange = (callbackFn: (value: number) => void) => (
-  ({ target }: ChangeEvent<HTMLInputElement>) => {
-    if (Number.isFinite(target.valueAsNumber)) {
-      callbackFn(target.valueAsNumber);
-    }
-  }
-);
 
 export const NetworkTab = () => {
   const {

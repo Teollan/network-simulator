@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Separator } from '@/components/ui/Separator';
 import { useNetworkStore } from '@/stores/useNetworkStore';
+import { useSimulationStore } from '@/stores/useSimulationStore';
 
 export const Toolbar = () => {
-  const { generateNetwork, isGenerating } = useNetworkStore();
+  const { networkLayout, generateNetwork, isGenerating } = useNetworkStore();
+  const { runSimulation } = useSimulationStore();
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-background px-3">
@@ -20,7 +22,11 @@ export const Toolbar = () => {
         Generate
       </Button>
 
-      <Button size="sm">
+      <Button
+        size="sm"
+        onClick={runSimulation}
+        disabled={!networkLayout}
+      >
         <Zap />
         Run
       </Button>

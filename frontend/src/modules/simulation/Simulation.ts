@@ -37,6 +37,8 @@ export class Simulation<T> {
   private nodeStatesByNodeId = new Map<number, T>;
   private linkStatesByLinkId = new Map<number, SimulationLinkState>;
 
+  readonly trace: SimulationEvent[] = [];
+
   readonly network: Network;
   readonly routingPolicy: RoutingPolicy<T>;
 
@@ -71,8 +73,7 @@ export class Simulation<T> {
       this.events.pop();
       this.clock = event.time;
 
-      console.log(`[${event.time}] [${event.kind}]`, event.data);
-
+      this.trace.push(event);
       this.dispatch(event);
     }
   }
@@ -231,8 +232,6 @@ export class Simulation<T> {
     }
 
     if (packet.destinationId === frame.destinationId) {
-      console.log('BINGO!');
-
       return;
     }
 
