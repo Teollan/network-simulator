@@ -34,7 +34,7 @@ Time & traffic model (all params configurable in UI + scenario config, with defa
 [x]: half-duplex links: one direction at a time, other side waits in queue
 []: bandwidth derived from weight (e.g. bandwidth = K/weight) to keep weight monotonic with latency; propagation per link type (ground ~ms, satellite ~250 ms)
 []: packet formats (bytes): data header, ACK, NACK, VC setup/confirm/teardown; payload size sweep range (e.g. 64 B .. 4 KB)
-[]: control packets (ACK, setup, flood copies...) occupy links and queues like data packets
+[]: control packets (ACK, NACK, VC setup/confirm/teardown...) occupy links and queues like data packets
 []: error model: per-bit error prob -> P_packet = 1 - (1 - p_bit)^bits (default) | flat per-packet prob
 []: ACK policy: hop-by-hop | end-to-end (selectable per transmission mode)
 []: retransmission timeout: fixed initial value, then adapted from measured RTT (avoid spurious retx on satellite hops) | fixed value
@@ -44,34 +44,28 @@ Time & traffic model (all params configurable in UI + scenario config, with defa
 Transmission modes:
 []: virtual circuit: setup (request/confirm) -> data over fixed path -> teardown
 []: VC state: per-node circuit table (VC id -> outgoing line), created on setup, removed on teardown/timeout
-[]: VC setup uses learned forwarding if destination is known, bootstrap method otherwise
+[]: VC setup request is routed by the local adaptive rule (see Routing); the path it takes is then fixed for the circuit
 []: VC broken by disabled node/link: circuit torn down, source re-runs setup (re-setup counted as control traffic)
 []: datagram: each packet routed independently, may arrive out of order
 []: message fragmentation into packets of configurable size (packet size independent of message size)
 []: reassembly at destination (incl. out-of-order arrival in datagram mode)
 
-Routing (local adaptive = backward learning):
-[]: nodes never exchange routing info; they learn only from packets passing through
+Routing (local adaptive, as defined in lecture 12, slide 23: the node chooses routes on its own, without information from other nodes; route tables are loaded centrally in advance; a packet goes along the shortest path, taking the shortest output queue into account):
+[]: nodes never exchange routing info at runtime; forwarding uses only the node's own table and its own output queues
 [x]: packets carry source, accumulated cost and hop count
-[]: on receiving a packet from S on line X: record "S reachable via X at cost c / h hops" (learning in reverse direction, assumes symmetric links)
-[]: table destinations = workstations (only traffic sources get learned; Task 2 tables are routes to workstations)
-[]: per node table: destination -> per outgoing line latest learned cost + hop count + timestamp (gives both Task 2 tables: by weight and by hops)
-[]: forwarding: pick line minimizing learned_cost + a*queue_len (a configurable; a = 0 => pure cost)
-[]: bootstrap for unknown destinations, configurable per simulation (UI + scenario config):
-    - flooding (default): TTL ~ network diameter + duplicate suppression via (source, seq) table; duplicates are learned from first, then dropped
-    - random walk: TTL
-    - hot potato (shortest queue): TTL
-[]: datagram mode: bootstrap only while destination is unknown, then learned forwarding
-[]: bootstrap copies (flood duplicates etc.) are counted as control traffic
+[]: route tables computed centrally before the run from the topology: per node, destination -> per outgoing line shortest-path cost (Dijkstra, by weight) and hop count (BFS, by hops) when leaving via that line (gives both Task 2 tables: by weight and by hops)
+[]: table destinations = workstations (Task 2 tables are routes to workstations)
+[]: forwarding: pick the outgoing line minimizing table_cost_via_line + a*queue_len (a configurable, in cost units per queued packet; a = 0 => fixed shortest path; large a => behaves like hot potato)
+[]: candidate lines: never the incoming line; option: any line | only lines that bring the packet closer to the destination (no detours, prevents loops)
 [x]: loop protection: TTL + don't send back on the incoming line
-[]: table entry aging: entries expire after configurable time, so failures/congestion get unlearned
-[]: reference: offline Dijkstra (by weight) + BFS (by hops) for comparison only, not used for forwarding
-[]: metric: fraction of table entries matching the reference vs number of messages passed (convergence)
+[]: table reload: on a topology change (node/link disabled or enabled) the central manager recomputes the tables and loads them into the nodes after a configurable delay; until then nodes forward with stale tables, and packets lost that way are counted (the lecture's "loss during table changes")
+[]: comparison policies, selectable per simulation (UI + scenario config): fixed shortest path (a = 0) and hot potato (shortest queue only), to show the effect of the queue term
+[]: metric: route oscillation (the lecture's "автоколивання"): packets that revisit a node, and how often a node's chosen line for a destination flips
 
 Simulation:
 [x]: Discrete Event Simulation DES 
 [x]: simulate communication between nodes
-[]: simulate routing with local adaptive routing (backward learning, see Routing section)
+[]: simulate routing with local adaptive routing (static shortest-path tables + output queue length, see Routing section)
 []: traffic: random traffic generator: arrival process (e.g. Poisson with rate lambda), message size distribution, src/dst selection (e.g. uniform over workstation pairs)
 []: traffic: manual "send N bytes from workstation A to B" (UI + scenario events)
 []: enable/disable nodes and links at runtime (UI or scheduled scenario events); disabled element drops its buffered packets (counted as lost)
@@ -92,7 +86,7 @@ Validation:
 []: single link: measured delay == t_hop formula
 []: single link under Poisson load: waiting time matches M/M/1 theory
 []: conservation: sent == delivered + lost + in flight
-[]: learned tables converge to Dijkstra/BFS reference on idle network with enough traffic
+[]: with a = 0 on an idle network, every packet follows the Dijkstra shortest path from its table
 
 Model & scenario files:
 []: model (topology + params) stored as JSON; UI loads/saves it (round-trip)
@@ -113,7 +107,7 @@ Visualization:
 []: mouse editing: add, delete, select, drag nodes and links
 []: hover/select info: route table, link weight, buffer load
 []: route tables view for every node (by weight and by hops)
-[]: step-by-step algorithm execution (watch tables get learned packet by packet)
+[]: step-by-step forwarding (watch each node's line choice: table cost + queue term, per packet)
 []: step-by-step view of the reference Dijkstra run
 
 Nice to have:
