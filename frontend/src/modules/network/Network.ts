@@ -1,4 +1,4 @@
-import type { CreateNodeFields, Node } from '@/modules/network/Node';
+import { DEFAULT_NODE_FIELDS, type CreateNodeFields, type Node } from '@/modules/network/Node';
 import { DEFAULT_LINK_FIELDS, type CreateLinkFields, type Link, type LinkFilters, type UpdateLinkFields } from '@/modules/network/Link';
 import { getLinkComplement, isLinkWith } from '@/modules/network/network.helpers';
 import type { CreateRegionFields, Region } from '@/modules/network/Region';
@@ -93,6 +93,7 @@ export class Network {
 
     const created = records.map((fields) => ({
       id: nodesSerial.next(),
+      ...DEFAULT_NODE_FIELDS,
       ...fields,
     }));
 

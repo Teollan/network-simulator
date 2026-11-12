@@ -4,6 +4,7 @@ export const NETWORK_BUILDER_ACTION = {
   SPAWN_REGION: 'spawn-region',
   LINK_INSIDE_REGION: 'link-inside-region',
   LINK_REGIONS: 'link-regions',
+  ATTACH_WORKSTATIONS: 'attach-workstations',
   ASSIGN_LINK_WEIGHTS: 'assign-link-weights',
   ASSIGN_BIT_ERROR_RATE: 'assign-bit-error-rate',
 } as const;
@@ -25,6 +26,11 @@ export type NetworkBuilderAction =
     kind: typeof NETWORK_BUILDER_ACTION.LINK_REGIONS;
     sourceRegion: string;
     targetRegion: string
+  }
+  | {
+    kind: typeof NETWORK_BUILDER_ACTION.ATTACH_WORKSTATIONS;
+    every: number;
+    region: string
   }
   | {
     kind: typeof NETWORK_BUILDER_ACTION.ASSIGN_LINK_WEIGHTS;
