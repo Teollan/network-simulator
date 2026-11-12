@@ -23,5 +23,9 @@ export const summarizeTrace = (trace: SimulationEvent[]): TraceSummary => {
     }
   }
 
-  return { eventCount: trace.length, deliveredCount, droppedCount };
+  return {
+    eventCount: trace.length,
+    deliveredCount,
+    droppedCount, 
+  };
 };

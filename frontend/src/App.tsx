@@ -8,7 +8,10 @@ function App() {
 
       <Toaster
         position="bottom-right"
-        offset={{ bottom: 64, right: 16 }}
+        offset={{
+          bottom: 64,
+          right: 16, 
+        }}
       />
     </>
   );

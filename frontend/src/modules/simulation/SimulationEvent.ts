@@ -1,6 +1,6 @@
-import type { NetworkFrame } from '@/modules/network/NetworkFrame';
-import type { NetworkMessage } from '@/modules/network/NetworkMessage';
-import type { NetworkPacket } from '@/modules/network/NetworkPacket';
+import type { Frame } from '@/modules/traffic/Frame';
+import type { Message } from '@/modules/traffic/Message';
+import type { Packet } from '@/modules/traffic/Packet';
 
 export const SIMULATION_EVENT_KIND = {
   MESSAGE_SENT: 'message::sent',
@@ -25,23 +25,23 @@ export type SimulationEventData<K extends SimulationEventKind> = {
   [SIMULATION_EVENT_KIND.MESSAGE_SENT]: {
     fromNodeId: number;
     toNodeId: number;
-    message: NetworkMessage;
+    message: Message;
   };
   [SIMULATION_EVENT_KIND.MESSAGE_RECEIVED]: {
     nodeId: number;
-    message: NetworkMessage;
+    message: Message;
   };
   [SIMULATION_EVENT_KIND.PACKET_CREATED]: {
-    packet: NetworkPacket;
+    packet: Packet;
   };
   [SIMULATION_EVENT_KIND.PACKET_SENT]: {
-    frame: NetworkFrame;
+    frame: Frame;
   };
   [SIMULATION_EVENT_KIND.PACKET_RECEIVED]: {
-    frame: NetworkFrame;
+    frame: Frame;
   };
   [SIMULATION_EVENT_KIND.PACKET_DROPPED]: {
-    packet: NetworkPacket;
+    packet: Packet;
     nodeId: number;
     reason: PacketDropReason;
   };

@@ -1,8 +1,8 @@
-import type { NetworkLink } from '@/modules/network/NetworkLink';
+import type { Link } from '@/modules/network/Link';
 import type { ElkExtendedEdge } from 'elkjs';
 
-export const networkLinkToElkEdge = (connection: NetworkLink): ElkExtendedEdge => ({
-  id: connection.id.toString(),
-  sources: [connection.sourceId.toString()],
-  targets: [connection.targetId.toString()],
+export const networkLinkToElkEdge = (link: Link): ElkExtendedEdge => ({
+  id: link.id.toString(),
+  sources: [link.sourceId.toString()],
+  targets: [link.targetId.toString()],
 });

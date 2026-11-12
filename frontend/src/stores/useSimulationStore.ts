@@ -31,7 +31,10 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
   },
 
   setSimulationConfig: (config) => set(({ simulationConfig }) => ({
-    simulationConfig: { ...simulationConfig, ...config },
+    simulationConfig: {
+      ...simulationConfig,
+      ...config,
+    },
   })),
 
   runSimulation: () => {
@@ -43,8 +46,8 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
 
     const { network } = networkLayout;
     const { routingPolicyId, runUntil } = get().simulationConfig;
-    const source = network.nodes.at(0);
-    const destination = network.nodes.at(-1);
+    const source = network.getNodes().at(0);
+    const destination = network.getNodes().at(-1);
 
     if (!source || !destination) {
       return;
@@ -57,7 +60,10 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
       data: {
         fromNodeId: source.id,
         toNodeId: destination.id,
-        message: { id: 1, length: PLACEHOLDER_MESSAGE_LENGTH },
+        message: {
+          id: 1,
+          length: PLACEHOLDER_MESSAGE_LENGTH,
+        },
       },
       time: 0,
     });

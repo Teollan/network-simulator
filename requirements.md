@@ -16,7 +16,6 @@ Model:
 []: weight must be monotonic with latency for a reference packet size: smaller weight => smaller latency (generator must keep this, e.g. satellite links get weights from the high end of the set)
 []: per-link attributes: type (ground/satellite), duplex | half-duplex, weight, p_bit (per-bit error probability), buffer size
 []: weight generation policy: random in range | constant from set
-[]: nodes have IPv4 addresses as labels only (no aggregation/subnetting logic)
 [x]: messages can be of varying length
 []: buffers are per outgoing link (output queues, needed for a*queue_len); size configurable per node (default for its links) with per-link override
 []: buffer size generation policy: random in range | constant from set
@@ -111,6 +110,7 @@ Visualization:
 []: step-by-step view of the reference Dijkstra run
 
 Nice to have:
+[]: nodes have IPv4 addresses as labels only (no aggregation/subnetting logic)
 []: Satellites as nodes, located in orbits over the planet
 []: Uplink node type: ground station that connects to satellites over the air
 []: Satellites can be connected to other satellites over the air

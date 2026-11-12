@@ -1,4 +1,4 @@
-export interface CreateNetworkPacketOptions {
+export interface CreatePacketOptions {
   messageId: number;
   offset: number;
   length: number;
@@ -9,7 +9,7 @@ export interface CreateNetworkPacketOptions {
   hopLimit: number;
 }
 
-export class NetworkPacket {
+export class Packet {
   private static nextId = 1;
   readonly id: number;
 
@@ -24,8 +24,8 @@ export class NetworkPacket {
   cost = 0;
   hops = 0;
 
-  constructor(options: CreateNetworkPacketOptions) {
-    this.id = NetworkPacket.nextId++;
+  constructor(options: CreatePacketOptions) {
+    this.id = Packet.nextId++;
 
     this.messageId = options.messageId;
     this.offset = options.offset;

@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import type { Network } from '@/modules/network/Network';
-import { generateNetwork, type NetworkConfig } from '@/modules/network/generateNetwork';
-import { DEFAULT_NETWORK_CONFIG } from '@/modules/network/network.constants';
+import { DEFAULT_NETWORK_RECIPE } from '@/modules/network/network.constants';
 import { layoutNetwork, type LayoutPositions } from '@/modules/layout/layoutNetwork';
 import { useTraceStore } from '@/stores/useTraceStore';
+import { makeNetwork } from '@/modules/network/builder/makeNetwork';
+import type { NetworkRecipe } from '@/modules/network/builder/NetworkRecipe';
 
 interface NetworkLayout {
   network: Network;
@@ -11,35 +12,41 @@ interface NetworkLayout {
 }
 
 interface NetworkStore {
-  networkConfig: NetworkConfig;
+  networkRecipe: NetworkRecipe;
   networkLayout: NetworkLayout | null;
   isGenerating: boolean;
 
-  setNetworkConfig: (config: Partial<NetworkConfig>) => void;
   generateNetwork: () => Promise<void>;
 }
 
 export const useNetworkStore = create<NetworkStore>()((set, get) => ({
-  networkConfig: DEFAULT_NETWORK_CONFIG,
+  networkRecipe: DEFAULT_NETWORK_RECIPE,
   networkLayout: null,
   isGenerating: false,
 
-  setNetworkConfig: (config) => set(({ networkConfig }) => ({
-    networkConfig: { ...networkConfig, ...config },
-  })),
-
   generateNetwork: async () => {
-    if (get().isGenerating) {
+    const {
+      isGenerating,
+      networkRecipe,
+    } = get();
+
+    if (isGenerating) {
       return;
     }
 
     set({ isGenerating: true });
 
     try {
-      const network = generateNetwork(get().networkConfig);
+      const network = makeNetwork(networkRecipe);
       const positions = await layoutNetwork(network);
 
-      set({ networkLayout: { network, positions }, isGenerating: false });
+      set({
+        networkLayout: {
+          network,
+          positions,
+        },
+        isGenerating: false,
+      });
 
       useTraceStore.getState().clearEvents();
     } catch (error) {

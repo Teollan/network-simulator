@@ -43,13 +43,16 @@ const CanvasFlow = () => {
 
     const { network, positions } = networkLayout;
 
-    setNodes(network.nodes.map((node) => {
-      const position = positions.get(node.id) ?? { x: 0, y: 0 };
+    setNodes(network.getNodes().map((node) => {
+      const position = positions.get(node.id) ?? {
+        x: 0,
+        y: 0,
+      };
 
       return networkNodeToFlowNode(node, position);
     }));
 
-    setEdges(network.links.map(networkLinkToFlowEdge));
+    setEdges(network.getLinks().map(networkLinkToFlowEdge));
 
     fitView();
   }, [networkLayout, setNodes, setEdges, fitView]);

@@ -14,11 +14,14 @@ export const layoutNetwork = async (network: Network): Promise<LayoutPositions> 
   const graph: ElkNode = {
     id: 'root',
     layoutOptions: ELK_LAYOUT_OPTIONS.STRESS,
-    children: network.nodes.map(networkNodeToElkNode),
-    edges: network.links.map(networkLinkToElkEdge),
+    children: network.getNodes().map(networkNodeToElkNode),
+    edges: network.getLinks().map(networkLinkToElkEdge),
   };
 
   const { children = [] } = await elk.layout(graph);
 
-  return new Map(children.map(({ id, x = 0, y = 0 }) => [Number(id), { x, y }]));
+  return new Map(children.map(({ id, x = 0, y = 0 }) => [Number(id), {
+    x,
+    y,
+  }]));
 };

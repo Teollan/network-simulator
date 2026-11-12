@@ -12,7 +12,7 @@ export const TraceEventList = ({ events }: TraceEventListProps) => {
   const { networkLayout } = useNetworkStore();
 
   const labelsById = useMemo(() => new Map(
-    networkLayout?.network.nodes.map(({ id, label }) => [id, label]),
+    networkLayout?.network.getNodes().map(({ id, label }) => [id, label]),
   ), [networkLayout]);
 
   const getLabel = (nodeId: number) => labelsById.get(nodeId) ?? `#${nodeId}`;

@@ -1,6 +1,6 @@
-import type { NetworkFrame } from '@/modules/network/NetworkFrame';
+import type { Frame } from '@/modules/traffic/Frame';
 
 export interface SimulationLinkState {
-  queue: NetworkFrame[];
+  queue: Frame[];
   isBusy: boolean;
 }

@@ -22,7 +22,10 @@ export const RouterNode = memo(({ data, selected }: RouterNodeProps) => {
           'flex items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground transition-all hover:bg-primary/80',
           selected && 'ring-3 ring-ring/50',
         )}
-        style={{ width: NODE_SIZE, height: NODE_SIZE }}
+        style={{
+          width: NODE_SIZE,
+          height: NODE_SIZE, 
+        }}
       >
         {data.label}
       </div>

@@ -219,9 +219,21 @@ describe('PriorityQueue<TestEvent>', () => {
     const queue = new PriorityQueue<TestEvent>(byTimeThenSeq);
 
     pushAll(queue, [
-      { time: 30, seq: 0, label: 'c' },
-      { time: 10, seq: 1, label: 'a' },
-      { time: 20, seq: 2, label: 'b' },
+      {
+        time: 30,
+        seq: 0,
+        label: 'c', 
+      },
+      {
+        time: 10,
+        seq: 1,
+        label: 'a', 
+      },
+      {
+        time: 20,
+        seq: 2,
+        label: 'b', 
+      },
     ]);
 
     expect(drain(queue).map(({ label }) => label)).toEqual(['a', 'b', 'c']);
@@ -231,11 +243,31 @@ describe('PriorityQueue<TestEvent>', () => {
     const queue = new PriorityQueue<TestEvent>(byTimeThenSeq);
 
     pushAll(queue, [
-      { time: 5, seq: 3, label: 'd' },
-      { time: 5, seq: 0, label: 'a' },
-      { time: 1, seq: 4, label: 'first' },
-      { time: 5, seq: 2, label: 'c' },
-      { time: 5, seq: 1, label: 'b' },
+      {
+        time: 5,
+        seq: 3,
+        label: 'd', 
+      },
+      {
+        time: 5,
+        seq: 0,
+        label: 'a', 
+      },
+      {
+        time: 1,
+        seq: 4,
+        label: 'first', 
+      },
+      {
+        time: 5,
+        seq: 2,
+        label: 'c', 
+      },
+      {
+        time: 5,
+        seq: 1,
+        label: 'b', 
+      },
     ]);
 
     expect(drain(queue).map(({ label }) => label)).toEqual(['first', 'a', 'b', 'c', 'd']);
@@ -243,7 +275,11 @@ describe('PriorityQueue<TestEvent>', () => {
 
   it('should keep schedule order for many events at the same time', () => {
     const queue = new PriorityQueue<TestEvent>(byTimeThenSeq);
-    const events = Array.from({ length: 100 }, (_, seq) => ({ time: 7, seq, label: `${seq}` }));
+    const events = Array.from({ length: 100 }, (_, seq) => ({
+      time: 7,
+      seq,
+      label: `${seq}`, 
+    }));
 
     pushAll(queue, [...events].reverse());
 
@@ -252,7 +288,11 @@ describe('PriorityQueue<TestEvent>', () => {
 
   it('should match a sort on a large random input', () => {
     const queue = new PriorityQueue<TestEvent>(byTimeThenSeq);
-    const events = randomNumbers(500).map((time, seq) => ({ time, seq, label: `${seq}` }));
+    const events = randomNumbers(500).map((time, seq) => ({
+      time,
+      seq,
+      label: `${seq}`, 
+    }));
 
     pushAll(queue, events);
 
@@ -263,7 +303,11 @@ describe('PriorityQueue<TestEvent>', () => {
 
   it('should return the same object references it was given', () => {
     const queue = new PriorityQueue<TestEvent>(byTimeThenSeq);
-    const event = { time: 1, seq: 0, label: 'a' };
+    const event = {
+      time: 1,
+      seq: 0,
+      label: 'a', 
+    };
 
     queue.push(event);
 
@@ -275,13 +319,25 @@ describe('PriorityQueue<TestEvent>', () => {
     const queue = new PriorityQueue<TestEvent>(byTimeThenSeq);
 
     pushAll(queue, [
-      { time: 10, seq: 0, label: 'a' },
-      { time: 20, seq: 1, label: 'c' },
+      {
+        time: 10,
+        seq: 0,
+        label: 'a', 
+      },
+      {
+        time: 20,
+        seq: 1,
+        label: 'c', 
+      },
     ]);
 
     const head = queue.pop();
 
-    queue.push({ time: 10, seq: 2, label: 'b' });
+    queue.push({
+      time: 10,
+      seq: 2,
+      label: 'b', 
+    });
 
     expect(head?.label).toBe('a');
     expect(drain(queue).map(({ label }) => label)).toEqual(['b', 'c']);

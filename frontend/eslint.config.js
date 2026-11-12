@@ -45,6 +45,13 @@ export default defineConfig([
       "@stylistic/jsx-one-expression-per-line": ["error", { allow: "none" }],
       "@stylistic/jsx-newline": ["error", { prevent: false }],
       "@stylistic/jsx-wrap-multilines": ["error", { return: "parens-new-line", arrow: "parens-new-line", declaration: "parens-new-line" }],
+      "@stylistic/object-curly-newline": ["error", {
+        ObjectExpression: { minProperties: 2, consistent: true },
+        ObjectPattern: { consistent: true },
+        ImportDeclaration: { consistent: true },
+        ExportDeclaration: { consistent: true },
+      }],
+      "@stylistic/object-property-newline": ["error", { allowAllPropertiesOnSameLine: false }],
     },
     ignores: ["dist/**", "node_modules/**"],
   },

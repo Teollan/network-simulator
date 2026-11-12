@@ -1,19 +1,19 @@
-import type { NetworkFrame } from '@/modules/network/NetworkFrame';
-import type { NetworkNode } from '@/modules/network/NetworkNode';
+import type { Frame } from '@/modules/traffic/Frame';
 import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/RoutingPolicy';
 import { shuffle } from '@/modules/util/shuffle';
+import type { Node } from '@/modules/network/Node';
 
 export class HotPotatoRP implements RoutingPolicy<null> {
-  initState(_: NetworkNode, __: RoutingPolicyContext): null {
+  initState(_: Node, __: RoutingPolicyContext): null {
     return null;
   }
 
-  onPacket(_: null, frame: NetworkFrame, ctx: RoutingPolicyContext) {
+  onPacket(_: null, frame: Frame, ctx: RoutingPolicyContext) {
     const senderId = frame.sourceId;
     const receiverId = frame.destinationId;
 
     const targetIds = ctx.network
-      .getAdjacentNodes(receiverId)
+      .getLinkedNodes(receiverId)
       .map((node) => node.id)
       .filter((id) => id !== senderId);
 
@@ -32,7 +32,7 @@ export class HotPotatoRP implements RoutingPolicy<null> {
     }
 
     const getBufferLength = (targetId: number) => {
-      const link = ctx.network.getLinkBetween(receiverId, targetId);
+      const link = ctx.network.findLinkBetween(receiverId, targetId);
       const linkState = link && ctx.linkStatesByLinkId.get(link.id);
 
       if (!linkState) {

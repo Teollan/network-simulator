@@ -1,119 +1,164 @@
-import { NetworkLink } from '@/modules/network/NetworkLink';
-import { NetworkNode } from '@/modules/network/NetworkNode';
-import { shuffle } from '@/modules/util/shuffle';
+import type { CreateNodeFields, Node } from '@/modules/network/Node';
+import { DEFAULT_LINK_FIELDS, type CreateLinkFields, type Link, type LinkFilters, type UpdateLinkFields } from '@/modules/network/Link';
+import { getLinkComplement, isLinkWith } from '@/modules/network/network.helpers';
+import type { CreateRegionFields, Region } from '@/modules/network/Region';
+import { Serial } from '@/modules/util/Serial';
 
 export class Network {
-  readonly nodes: NetworkNode[] = [];
-  readonly links: NetworkLink[] = [];
+  private regionsSerial = new Serial();
+  private regions: Region[] = [];
 
-  spawn(count: number, region: string) {
-    this.nodes.push(
-      ...Array.from(
-        { length: count },
-        (_, idx) => new NetworkNode(`${region}-${idx + 1}`),
-      ),
+  private nodesSerial = new Serial();
+  private nodes: Node[] = [];
+
+  private linksSerial = new Serial();
+  private links: Link[] = [];
+
+  // === REGION === 
+  findRegion(regionId: number): Region | null {
+    return this.regions.find(
+      (region) => region.id === regionId,
+    ) ?? null;
+  }
+
+  findRegionByLabel(regionLabel: string): Region | null {
+    return this.regions.find(
+      (region) => region.label === regionLabel,
+    ) ?? null;
+  }
+
+  getRegion(regionId: number): Region {
+    const result = this.findRegion(regionId);
+
+    if (!result) {
+      throw Error(`Region with id [${regionId}] does not exist!`);
+    }
+
+    return result;
+  }
+
+  getRegionByLabel(regionLabel: string): Region {
+    const result = this.findRegionByLabel(regionLabel);
+
+    if (!result) {
+      throw Error(`Region with label [${regionLabel}] does not exist`);
+    }
+
+    return result;
+  }
+
+  createRegion(fields: CreateRegionFields): Region {
+    const { regions, regionsSerial } = this;
+
+    const created = {
+      id: regionsSerial.next(),
+      ...fields,
+    };
+
+    regions.push(created);
+
+    return created;
+  }
+
+  // === NODE === 
+  getNodes(): Node[] {
+    return [...this.nodes];
+  }
+
+  getLinkedNodes(nodeId: number): Node[] {
+    const { nodes, links } = this;
+
+    const nodeLinks = links.filter(isLinkWith(nodeId));
+    const linkedNodeIds = nodeLinks.map(getLinkComplement(nodeId));
+
+    return nodes.filter(({ id }) => linkedNodeIds.includes(id));
+  }
+
+  getNodesByRegion(regionId: number): Node[] {
+    return this.nodes.filter(
+      (node) => node.regionId === regionId,
     );
   }
 
-  connect(
-    degree: number,
-    selectorFn: (node: NetworkNode) => boolean,
-    weightPool: number[],
-  ) {
-    const getRandomWeight = () => weightPool[Math.floor(Math.random() * weightPool.length)];
+  getNodesByRegionLabel(regionLabel: string): Node[] {
+    const region = this.getRegionByLabel(regionLabel);
 
-    const nodes = this.nodes.filter(selectorFn);
-
-    const pruferSequence = Array.from(
-      { length: nodes.length - 2 },
-      () => Math.floor(Math.random() * nodes.length),
+    return this.nodes.filter(
+      (node) => node.regionId === region.id,
     );
-
-    const vertexSet = Array.from(
-      { length: nodes.length },
-      () => 0,
-    );
-
-    for (const sequenceItem of pruferSequence) {
-      vertexSet[sequenceItem] += 1;
-    }
-
-    const treeEdges: NetworkLink[] = [];
-
-    for (const sequenceItem of pruferSequence) {
-      for (let j = 0; j < nodes.length; j++) {
-        if (vertexSet[j] === 0) {
-          vertexSet[j] = -1;
-
-          treeEdges.push(new NetworkLink(nodes[j].id, nodes[sequenceItem].id, getRandomWeight()));
-
-          vertexSet[sequenceItem]--;
-
-          break;
-        }
-      }
-    }
-
-    let x: NetworkNode | null = null;
-
-    for (let i = 0; i < nodes.length; i++) {
-      if (vertexSet[i] !== 0) {
-        continue;
-      }
-
-      if (x === null) {
-        x = nodes[i];
-      } else {
-        treeEdges.push(new NetworkLink(x.id, nodes[i].id, getRandomWeight()));
-      }
-    }
-
-    const pairs: [number, number][] = [];
-
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        pairs.push([nodes[i].id, nodes[j].id]);
-      }
-    }
-
-    const unusedPairs = pairs.filter(
-      ([sourceId, targetId]) => {
-        const existingEdge = treeEdges.find((edge) => {
-          const isSameSource = edge.sourceId === sourceId;
-          const isSameTarget = edge.targetId === targetId;
-          const isMirrorSource = edge.sourceId === targetId;
-          const isMirrorTarget = edge.targetId === sourceId;
-
-          return (isSameSource && isSameTarget) || (isMirrorSource && isMirrorTarget);
-        });
-
-        return !(existingEdge);
-      },
-    );
-
-    const expectedEdgesCount = Math.round(degree * (nodes.length / 2));
-
-    const tagOnEdges = shuffle(unusedPairs)
-      .slice(0, Math.max(0, expectedEdgesCount - treeEdges.length))
-      .map(([sourceId, targetId]) => new NetworkLink(sourceId, targetId, getRandomWeight()));
-
-    this.links.push(...treeEdges, ...tagOnEdges);
   }
 
-  getAdjacentNodes(nodeId: number): NetworkNode[] {
-    const links = this.links.filter((link) => link.doesLink(nodeId));
+  createManyNodes(records: CreateNodeFields[]): Node[] {
+    const { nodes, nodesSerial } = this;
 
-    const neighborIds = links.map((link) => link.getComplement(nodeId));
+    const created = records.map((fields) => ({
+      id: nodesSerial.next(),
+      ...fields,
+    }));
 
-    return this.nodes.filter(({ id }) => neighborIds.includes(id));
+    nodes.push(...created);
+
+    return created;
   }
 
-  getLinkBetween(a: number, b: number): NetworkLink | null {
-    return this.links.find((link) => {
+  // === LINK === 
+  findLinkBetween(a: number, b: number): Link | null {
+    const { links } = this;
+
+    return links.find((link) => {
       const isDirect = link.sourceId === a && link.targetId === b;
       const isReverse = link.sourceId === b && link.targetId === a;
 
       return isDirect || isReverse;
     }) ?? null;
+  }
+
+  getLinks(filters: LinkFilters = {}): Link[] {
+    const { links } = this;
+
+    const keys = Object.keys(filters) as (keyof LinkFilters)[];
+
+    return links.filter((link) => (
+      keys.every((key) => (
+        filters[key] === undefined || link[key] === filters[key]
+      ))
+    ));
+  }
+
+  createLink(fields: CreateLinkFields) {
+    const { links, linksSerial } = this;
+
+    links.push({
+      id: linksSerial.next(),
+      ...DEFAULT_LINK_FIELDS,
+      ...fields,
+    });
+  }
+
+  createManyLinks(records: CreateLinkFields[]) {
+    const { links, linksSerial } = this;
+
+    const created = records.map((fields) => ({
+      id: linksSerial.next(),
+      ...DEFAULT_LINK_FIELDS,
+      ...fields,
+    }));
+
+    links.push(...created);
+
+    return created;
+  }
+
+  updateManyLinks(records: UpdateLinkFields[]) {
+    const { links } = this;
+
+    for (const fields of records) {
+      const index = links.findIndex((link) => link.id === fields.id);
+
+      links[index] = {
+        ...links[index],
+        ...fields,
+      };
+    }
   }
 }

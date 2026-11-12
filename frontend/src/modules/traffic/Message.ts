@@ -1,4 +1,4 @@
-export interface NetworkMessage {
+export interface Message {
   id: number;
   length: number;
 }
