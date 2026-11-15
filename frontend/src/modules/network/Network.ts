@@ -37,6 +37,10 @@ export class Network {
     return result;
   }
 
+  getRegions(): Region[] {
+    return [...this.regions];
+  }
+
   getRegionByLabel(regionLabel: string): Region {
     const result = this.findRegionByLabel(regionLabel);
 
@@ -124,6 +128,16 @@ export class Network {
         filters[key] === undefined || link[key] === filters[key]
       ))
     ));
+  }
+
+  getLinkBetween(a: number, b: number): Link {
+    const result = this.findLinkBetween(a, b);
+
+    if (!result) {
+      throw Error(`Link between nodes [${a}] and [${b}] does not exist!`);
+    }
+
+    return result;
   }
 
   createLink(fields: CreateLinkFields) {

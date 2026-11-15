@@ -2,7 +2,7 @@ import type { Network } from '@/modules/network/Network';
 import type { Frame } from '@/modules/traffic/Frame';
 import { Packet } from '@/modules/traffic/Packet';
 import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/RoutingPolicy';
-import type { SimulationLinkState } from '@/modules/simulation/SimulationLinkState';
+import { isLinkBusy, type StatefulLink } from '@/modules/simulation/state/StatefulLink';
 import {
   PACKET_DROP_REASON,
   SIMULATION_EVENT_KIND,
@@ -10,7 +10,7 @@ import {
   type SimulationEvent,
 } from '@/modules/simulation/SimulationEvent';
 import { PriorityQueue } from '@/modules/util/PriorityQueue/PriorityQueue';
-import type { Link } from '@/modules/network/Link';
+import { StatefulNetwork } from '@/modules/simulation/state/StatefulNetwork';
 
 const MAX_PACKET_LENGTH = 10;
 const HOP_LIMIT = 10;
@@ -32,37 +32,21 @@ const byTimeThenSeq = (a: ScheduledSimulationEvent, b: ScheduledSimulationEvent)
 
 export class Simulation<T> {
   private events = new PriorityQueue<ScheduledSimulationEvent>(byTimeThenSeq);
+  readonly trace: SimulationEvent[] = [];
   private nextSeq = 0;
   private clock = 0;
 
-  private nodeStatesByNodeId = new Map<number, T>;
-  private linkStatesByLinkId = new Map<number, SimulationLinkState>;
-
-  readonly trace: SimulationEvent[] = [];
-
-  readonly network: Network;
-  readonly routingPolicy: RoutingPolicy<T>;
+  private network: StatefulNetwork;
+  private routingPolicy: RoutingPolicy<T>;
 
   constructor(network: Network, routingPolicy: RoutingPolicy<T>) {
-    this.network = network;
+    this.network = new StatefulNetwork(network);
     this.routingPolicy = routingPolicy;
-
-    for (const link of network.getLinks()) {
-      this.linkStatesByLinkId.set(link.id, {
-        queue: [],
-        isBusy: false,
-      });
-    }
-
-    for (const node of network.getNodes()) {
-      this.nodeStatesByNodeId.set(node.id, routingPolicy.initState(node, this.routingContext));
-    }
   }
 
   private get routingContext(): RoutingPolicyContext {
     return {
       network: this.network,
-      linkStatesByLinkId: this.linkStatesByLinkId,
     };
   }
 
@@ -186,14 +170,8 @@ export class Simulation<T> {
 
   private handlePacketCreated({ data }: SimulationEvent<typeof SIMULATION_EVENT_KIND.PACKET_CREATED>) {
     const { packet } = data;
-    const state = this.nodeStatesByNodeId.get(packet.sourceId);
 
-    if (state === undefined) {
-      throw Error('The router state is undefined!');
-    }
-
-    const result = this.routingPolicy.onPacket(
-      state,
+    const destinationIds = this.routingPolicy.onPacket(
       {
         packet,
         sourceId: packet.sourceId,
@@ -202,16 +180,14 @@ export class Simulation<T> {
       this.routingContext,
     );
 
-    this.nodeStatesByNodeId.set(packet.sourceId, result.state);
-
-    if (!result.destinationIds.length) {
+    if (!destinationIds.length) {
       this.drop(packet, packet.sourceId, PACKET_DROP_REASON.NO_ROUTE);
 
       return;
     }
 
-    for (const destinationId of result.destinationIds) {
-      this.enqueue({
+    for (const destinationId of destinationIds) {
+      this.enqueueFrame({
         packet,
         sourceId: packet.sourceId,
         destinationId,
@@ -222,11 +198,7 @@ export class Simulation<T> {
   private handlePacketSent({ data }: SimulationEvent<typeof SIMULATION_EVENT_KIND.PACKET_SENT>) {
     const { frame } = data;
 
-    const link = this.network.findLinkBetween(frame.sourceId, frame.destinationId);
-
-    if (!link) {
-      throw Error('Packet enqueued over missing link!');
-    }
+    const link = this.network.getLinkBetween(frame.sourceId, frame.destinationId);
 
     // the receiving node processes the frame before it counts as received,
     // so routing still happens at the moment the frame is enqueued further
@@ -236,23 +208,13 @@ export class Simulation<T> {
       time: this.clock + this.getPropagationDelay(link) + PROCESSING_DELAY,
     });
 
-    const state = this.linkStatesByLinkId.get(link.id);
-
-    if (!state) {
-      throw Error('Link state is undefined!');
-    }
-
-    this.transmitNext(link, state);
+    this.network.updateLinkIsBusy(link.id, frame.sourceId, false);
+    this.sendNextFrame(frame.destinationId, frame.sourceId);
   }
 
   private handlePacketReceived({ data }: SimulationEvent<typeof SIMULATION_EVENT_KIND.PACKET_RECEIVED>) {
     const { frame } = data;
     const { packet } = frame;
-    const state = this.nodeStatesByNodeId.get(frame.destinationId);
-
-    if (state === undefined) {
-      throw Error('Routing State is undefined!');
-    }
 
     if (packet.destinationId === frame.destinationId) {
       return;
@@ -265,24 +227,18 @@ export class Simulation<T> {
       return;
     }
 
-    const result = this.routingPolicy.onPacket(state, frame, this.routingContext);
+    const destinationIds = this.routingPolicy.onPacket(frame, this.routingContext);
 
-    this.nodeStatesByNodeId.set(frame.destinationId, result.state);
-
-    if (!result.destinationIds.length) {
+    if (!destinationIds.length) {
       this.drop(packet, frame.destinationId, PACKET_DROP_REASON.NO_ROUTE);
 
       return;
     }
 
-    for (const destinationId of result.destinationIds) {
-      const link = this.network.findLinkBetween(frame.destinationId, destinationId);
+    for (const destinationId of destinationIds) {
+      const link = this.network.getLinkBetween(frame.destinationId, destinationId);
 
-      if (!link) {
-        throw Error('Packet routed over missing link!');
-      }
-
-      this.enqueue({
+      this.enqueueFrame({
         packet: {
           ...packet,
           cost: packet.cost + link.weight,
@@ -298,27 +254,31 @@ export class Simulation<T> {
     // TODO: collect loss stats
   }
 
-  private enqueue(frame: Frame) {
-    const link = this.network.findLinkBetween(frame.sourceId, frame.destinationId);
-    const state = link && this.linkStatesByLinkId.get(link.id);
+  private enqueueFrame(frame: Frame) {
+    this.network.pushFrame(frame);
 
-    if (!link || !state) {
-      throw Error('Packet enqueued over missing link!');
-    }
+    const link = this.network.getLinkBetween(frame.sourceId, frame.destinationId);
 
-    state.queue.push(frame);
-
-    if (!state.isBusy) {
-      this.transmitNext(link, state);
+    if (!isLinkBusy(link, frame.sourceId)) {
+      this.sendNextFrame(frame.sourceId, frame.destinationId);
     }
   }
 
-  private transmitNext(link: Link, state: SimulationLinkState) {
-    const frame = state.queue.shift();
+  private sendNextFrame(sourceId: number, targetId: number) {
+    const link = this.network.getLinkBetween(sourceId, targetId);
 
-    state.isBusy = Boolean(frame);
+    if (isLinkBusy(link, sourceId)) {
+      throw Error(`Link between nodes [${sourceId}] and [${targetId}] is busy!`);
+    }
+
+    const sourceBuffer = this.network.getNode(sourceId).buffers.to(targetId);
+    const targetBuffer = this.network.getNode(targetId).buffers.to(sourceId);
+
+    const frame = sourceBuffer.pop() || targetBuffer.pop();
 
     if (!frame) {
+      this.network.updateLinkIsBusy(link.id, sourceId, false);
+
       return;
     }
 
@@ -329,13 +289,13 @@ export class Simulation<T> {
     });
   }
 
-  private getTransmissionTime(frame: Frame, link: Link): number {
+  private getTransmissionTime(frame: Frame, link: StatefulLink): number {
     const bandwidth = BANDWIDTH_FACTOR / link.weight;
 
     return (PACKET_HEADER_LENGTH + frame.packet.length) / bandwidth;
   }
 
-  private getPropagationDelay(_link: Link): number {
+  private getPropagationDelay(_link: StatefulLink): number {
     // TODO: per link type, satellite links are much slower
     return GROUND_PROPAGATION_DELAY;
   }

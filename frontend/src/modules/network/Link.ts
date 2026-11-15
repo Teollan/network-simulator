@@ -1,5 +1,5 @@
 export const LINK_TYPE = {
-  DUPLEX: 'duplex',
+  FULL_DUPLEX: 'full-duplex',
   HALF_DUPLEX: 'half-duplex',
 } as const;
 
@@ -25,7 +25,7 @@ export interface Link {
 }
 
 export const DEFAULT_LINK_FIELDS = {
-  type: LINK_TYPE.DUPLEX,
+  type: LINK_TYPE.FULL_DUPLEX,
   medium: LINK_MEDIUM.GROUND,
   weight: 1,
   bitErrorRate: 0,

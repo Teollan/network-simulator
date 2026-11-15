@@ -1,19 +1,12 @@
-import type { Network } from '@/modules/network/Network';
 import type { Frame } from '@/modules/traffic/Frame';
-import type { SimulationLinkState } from '@/modules/simulation/SimulationLinkState';
 import type { Node } from '@/modules/network/Node';
+import type { StatefulNetwork } from '@/modules/simulation/state/StatefulNetwork';
 
 export interface RoutingPolicyContext {
-  readonly network: Network;
-  readonly linkStatesByLinkId: ReadonlyMap<number, SimulationLinkState>;
+  readonly network: StatefulNetwork;
 };
-
-export interface RoutingResult<T> {
-  state: T,
-  destinationIds: number[]
-}
 
 export interface RoutingPolicy<T> {
   initState(node: Node, ctx: RoutingPolicyContext): T;
-  onPacket(state: T, frame: Frame, ctx: RoutingPolicyContext): RoutingResult<T>;
+  onPacket(frame: Frame, ctx: RoutingPolicyContext): number[];
 }
