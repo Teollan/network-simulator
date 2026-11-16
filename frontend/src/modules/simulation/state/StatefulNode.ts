@@ -80,7 +80,7 @@ export class StatefulNode {
     packets.push(packet);
     packets.sort(byOffset);
 
-    const isTerminated = packets[-1].isLast;
+    const isTerminated = packets.at(-1)!.isLast;
 
     if (!isTerminated) {
       return null;

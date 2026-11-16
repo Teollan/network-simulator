@@ -68,7 +68,20 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
       }],
     });
 
-    simulation.run(runUntil);
+    try {
+      simulation.run(runUntil);
+    } catch (error) {
+      console.error(error);
+
+      // INFO: the trace ends with the event whose handler failed
+      useTraceStore.getState().setEvents(simulation.trace);
+
+      toast.error(`Simulation failed at t = ${simulation.time.toFixed(2)}`, {
+        description: error instanceof Error ? error.message : String(error),
+      });
+
+      return;
+    }
 
     useTraceStore.getState().setEvents(simulation.trace);
 

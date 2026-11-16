@@ -17,6 +17,8 @@ import { handlePacketDropped } from '@/modules/simulation/events/handlers/handle
 import { handleFrameForwarded } from '@/modules/simulation/events/handlers/handleFrameForwarded';
 import { handleFrameSent } from '@/modules/simulation/events/handlers/handleFrameSent';
 import { handleFrameReceived } from '@/modules/simulation/events/handlers/handleFrameReceived';
+import { handleLinkAcquired } from '@/modules/simulation/events/handlers/handleLinkAcquired';
+import { handleLinkReleased } from '@/modules/simulation/events/handlers/handleLinkReleased';
 import { Serial } from '@/modules/util/Serial';
 import type { SimulationEventHandler } from '@/modules/simulation/events/handlers/handlers.typedef';
 import { PacketFactory } from '@/modules/traffic/PacketFactory';
@@ -60,6 +62,9 @@ export class Simulation {
     [SIMULATION_EVENT_KIND.FRAME_FORWARDED]: [handleFrameForwarded],
     [SIMULATION_EVENT_KIND.FRAME_SENT]: [handleFrameSent],
     [SIMULATION_EVENT_KIND.FRAME_RECEIVED]: [handleFrameReceived],
+
+    [SIMULATION_EVENT_KIND.LINK_ACQUIRED]: [handleLinkAcquired],
+    [SIMULATION_EVENT_KIND.LINK_RELEASED]: [handleLinkReleased],
   };
 
   constructor(config: SimulationConfig) {
@@ -107,14 +112,8 @@ export class Simulation {
 
       const handlers = this.handlersByEventKind[event.kind] as SimulationEventHandler<typeof event.kind>[];
 
-      try {
-        for (const handler of handlers) {
-          handler(event, this);
-        }
-      } catch (e) {
-        console.error(e);
-
-        break;
+      for (const handler of handlers) {
+        handler(event, this);
       }
     }
   }

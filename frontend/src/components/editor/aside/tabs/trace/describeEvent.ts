@@ -4,6 +4,8 @@ import {
   CircleCheck,
   CircleX,
   ListPlus,
+  Lock,
+  LockOpen,
   MailCheck,
   PackagePlus,
   Radio,
@@ -108,6 +110,24 @@ export const describeEvent = (
       return {
         icon: ArrowRight,
         title: `packet #${packet.id} arrived ${getLabel(source.id)} → ${getLabel(destination.id)}`,
+      };
+    }
+
+    case SIMULATION_EVENT_KIND.LINK_ACQUIRED: {
+      const { source, destination } = event.data;
+
+      return {
+        icon: Lock,
+        title: `link ${getLabel(source.id)} → ${getLabel(destination.id)} acquired`,
+      };
+    }
+
+    case SIMULATION_EVENT_KIND.LINK_RELEASED: {
+      const { source, destination } = event.data;
+
+      return {
+        icon: LockOpen,
+        title: `link ${getLabel(source.id)} → ${getLabel(destination.id)} released`,
       };
     }
   }

@@ -22,9 +22,13 @@ export function handlePacketReceived(
         eta: 0,
       });
     }
+
+    return;
   }
 
-  if (packet.hopLimit === 0) {
+  const hopLimit = packet.hopLimit - 1;
+
+  if (hopLimit <= 0) {
     simulation.schedule({
       kind: SIMULATION_EVENT_KIND.PACKET_DROPPED,
       data: {
@@ -43,7 +47,10 @@ export function handlePacketReceived(
     data: {
       from,
       thisNode,
-      packet,
+      packet: {
+        ...packet,
+        hopLimit,
+      },
     },
     eta: PROPAGATION_DELAY,
   });

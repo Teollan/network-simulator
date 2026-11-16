@@ -14,6 +14,9 @@ export const SIMULATION_EVENT_KIND = {
   FRAME_FORWARDED: 'frame::forwarded',
   FRAME_SENT: 'frame::sent',
   FRAME_RECEIVED: 'frame::received',
+
+  LINK_ACQUIRED: 'link::acquired',
+  LINK_RELEASED: 'link::released',
 } as const;
 
 export type SimulationEventKind = typeof SIMULATION_EVENT_KIND[keyof typeof SIMULATION_EVENT_KIND];
@@ -60,6 +63,15 @@ export type SimulationEventData<K extends SimulationEventKind> = {
   };
   [SIMULATION_EVENT_KIND.FRAME_RECEIVED]: {
     frame: Frame;
+  };
+
+  [SIMULATION_EVENT_KIND.LINK_ACQUIRED]: {
+    source: StatefulNode;
+    destination: StatefulNode;
+  };
+  [SIMULATION_EVENT_KIND.LINK_RELEASED]: {
+    source: StatefulNode;
+    destination: StatefulNode;
   };
 }[K];
 

@@ -6,19 +6,25 @@ export function handleFrameForwarded(
   simulation: Simulation,
 ) {
   const { frame } = event.data;
+  const { source, destination } = frame;
 
-  const link = frame.source.getLinkTo(frame.destination);
+  const buffer = source.getBufferTo(destination);
 
-  if (link.isBusy) {
-    const buffer = frame.source.getBufferTo(frame.destination);
+  buffer.push(frame);
 
-    buffer.push(frame);
-  } else {
-    link.isBusy = true;
+  if (buffer.length > 1) {
+    return;
+  }
 
+  const link = source.getLinkTo(destination);
+
+  if (!link.isBusy) {
     simulation.schedule({
-      kind: SIMULATION_EVENT_KIND.FRAME_SENT,
-      data: { frame },
+      kind: SIMULATION_EVENT_KIND.LINK_ACQUIRED,
+      data: {
+        source,
+        destination,
+      },
       eta: 0,
     });
   }
