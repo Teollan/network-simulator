@@ -1,7 +1,8 @@
+import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 import type { Packet } from '@/modules/traffic/Packet';
 
 export interface Frame {
   packet: Packet;
-  sourceId: number;
-  destinationId: number;
+  source: StatefulNode;
+  destination: StatefulNode;
 }

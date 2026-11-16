@@ -1,4 +1,4 @@
-import { DEFAULT_NODE_FIELDS, type CreateNodeFields, type Node } from '@/modules/network/Node';
+import { DEFAULT_NODE_FIELDS, type CreateNodeFields, type Node, type NodeFilters } from '@/modules/network/Node';
 import { DEFAULT_LINK_FIELDS, type CreateLinkFields, type Link, type LinkFilters, type UpdateLinkFields } from '@/modules/network/Link';
 import { getLinkComplement, isLinkWith } from '@/modules/network/network.helpers';
 import type { CreateRegionFields, Region } from '@/modules/network/Region';
@@ -65,8 +65,16 @@ export class Network {
   }
 
   // === NODE === 
-  getNodes(): Node[] {
-    return [...this.nodes];
+  getNodes(filters: NodeFilters = {}): Node[] {
+    const { nodes } = this;
+
+    const keys = Object.keys(filters) as (keyof NodeFilters)[];
+
+    return nodes.filter((node) => (
+      keys.every((key) => (
+        filters[key] === undefined || node[key] === filters[key]
+      ))
+    ));
   }
 
   getLinkedNodes(nodeId: number): Node[] {

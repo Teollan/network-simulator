@@ -1,4 +1,4 @@
-import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/SimulationEvent';
+import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
 
 export interface TraceSummary {
   eventCount: number;
@@ -17,7 +17,7 @@ export const summarizeTrace = (trace: SimulationEvent[]): TraceSummary => {
 
     if (
       event.kind === SIMULATION_EVENT_KIND.PACKET_RECEIVED
-      && event.data.frame.packet.destinationId === event.data.frame.destinationId
+      && event.data.packet.destination === event.data.thisNode
     ) {
       deliveredCount++;
     }
@@ -26,6 +26,6 @@ export const summarizeTrace = (trace: SimulationEvent[]): TraceSummary => {
   return {
     eventCount: trace.length,
     deliveredCount,
-    droppedCount, 
+    droppedCount,
   };
 };

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { SimulationEvent } from '@/modules/simulation/SimulationEvent';
+import type { SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
 
 interface TraceStore {
   events: SimulationEvent[];

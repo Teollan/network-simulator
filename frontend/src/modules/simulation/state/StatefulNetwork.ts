@@ -1,117 +1,56 @@
-import { LINK_TYPE } from '@/modules/network/Link';
 import type { Network } from '@/modules/network/Network';
 import { getLinkComplement, isLinkWith } from '@/modules/network/network.helpers';
-import { NodeBuffers } from '@/modules/simulation/state/NodeBuffers';
-import { type StatefulLink } from '@/modules/simulation/state/StatefulLink';
-import { type StatefulNode } from '@/modules/simulation/state/StatefulNode';
-import type { Frame } from '@/modules/traffic/Frame';
-import { pick } from '@/modules/util/functional';
+import { NODE_TYPE } from '@/modules/network/Node';
+import { makeStatefulLink, type IsBusy, type StatefulLink } from '@/modules/simulation/state/StatefulLink';
+import { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
 export class StatefulNetwork {
   private readonly nodes: StatefulNode[] = [];
-  private readonly links: StatefulLink[] = [];
+  private readonly links: StatefulLink<IsBusy>[] = [];
 
   constructor(network: Network) {
-    this.nodes = network.getNodes().map((node) => ({
-      ...node,
-      buffers: new NodeBuffers(
-        network.getLinkedNodes(node.id).map(pick('id')),
-        Infinity, // TODO: take this from the node
-      ),
-    }));
+    this.nodes = network.getNodes().map((node) => new StatefulNode(node));
+    this.links = network.getLinks().map(makeStatefulLink);
 
-    this.links = network.getLinks().map((link): StatefulLink => {
-      switch (link.type) {
-        case LINK_TYPE.HALF_DUPLEX:
-          return {
-            ...link,
-            type: LINK_TYPE.HALF_DUPLEX,
-            isBusy: false,
-          };
+    for (const source of this.nodes) {
+      const nodeLinks = this.getLinksWith(source.id);
 
-        case LINK_TYPE.FULL_DUPLEX:
-          return {
-            ...link,
-            type: LINK_TYPE.FULL_DUPLEX,
-            isBusy: {
-              direct: false,
-              inverse: false,
-            },
-          };
+      const connections = nodeLinks.map((link) => {
+        const destination = this.getNode(getLinkComplement(source.id)(link));
+
+        return {
+          link,
+          destination,
+        };
+      });
+
+      for (const { link, destination } of connections) {
+        source.addLinkTo(destination, link);
       }
-    });
-  }
-
-  // === NODE === 
-  getNode(nodeId: number): StatefulNode {
-    const result = this.nodes.find((node) => node.id === nodeId);
-
-    if (!result) {
-      throw Error(`Node with id [${nodeId}] does not exist!`);
-    }
-
-    return result;
-  }
-
-  getLinkedNodes(nodeId: number): StatefulNode[] {
-    const { nodes, links } = this;
-
-    const nodeLinks = links.filter(isLinkWith(nodeId));
-    const linkedNodeIds = nodeLinks.map(getLinkComplement(nodeId));
-
-    return nodes.filter(({ id }) => linkedNodeIds.includes(id));
-  }
-
-  // === LINK === 
-  getLinkBetween(a: number, b: number): StatefulLink {
-    const { links } = this;
-
-    const result = links.find((link) => {
-      const withA = isLinkWith(a)(link);
-      const withB = isLinkWith(b)(link);
-
-      return withA && withB;
-    });
-
-    if (!result) {
-      throw Error(`Link between nodes [${a}] and [${b}] does not exist!`);
-    }
-
-    return result;
-  }
-
-  updateLinkIsBusy(linkId: number, sourceId: number, isBusy: boolean) {
-    const link = this.links.find((link) => link.id === linkId);
-
-    if (!link) {
-      throw Error(`Link with id [${linkId}] does not exist!`);
-    }
-
-    switch (link.type) {
-      case LINK_TYPE.HALF_DUPLEX:
-        link.isBusy = isBusy;
-        break;
-
-      case LINK_TYPE.FULL_DUPLEX:
-        if (link.sourceId === sourceId) {
-          link.isBusy.direct = isBusy;
-        } else {
-          link.isBusy.inverse = isBusy;
-        }
-        break;
     }
   }
 
-  // === MISC ===
-  pushFrame(frame: Frame) {
-    const source = this.getNode(frame.sourceId);
+  getNode(id: number): StatefulNode {
+    const node = this.nodes.find((node) => node.id === id);
 
-    source.buffers.to(frame.destinationId).push(frame);
+    if (!node) {
+      throw Error(`Node with id [${id}] does not exist!`);
+    }
+
+    return node;
   }
 
-  popFrame(sourceId: number, destinationId: number): Frame | null {
-    const source = this.getNode(sourceId);
+  getWorkstation(id: number): StatefulNode {
+    const node = this.getNode(id);
 
-    return source.buffers.to(destinationId).pop();
+    if (node.type !== NODE_TYPE.WORKSTATION) {
+      throw Error(`Node with id [${id}] is not a WORKSTATION`);
+    }
+
+    return node;
+  }
+
+  getLinksWith(nodeId: number) {
+    return this.links.filter(isLinkWith(nodeId));
   }
 }

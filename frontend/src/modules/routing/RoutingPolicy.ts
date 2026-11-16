@@ -1,12 +1,11 @@
-import type { Frame } from '@/modules/traffic/Frame';
-import type { Node } from '@/modules/network/Node';
-import type { StatefulNetwork } from '@/modules/simulation/state/StatefulNetwork';
+import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
-export interface RoutingPolicyContext {
-  readonly network: StatefulNetwork;
-};
+export interface RoutingOptions {
+  thisNode: StatefulNode;
+  source: StatefulNode | null;
+  destination: StatefulNode;
+}
 
-export interface RoutingPolicy<T> {
-  initState(node: Node, ctx: RoutingPolicyContext): T;
-  onPacket(frame: Frame, ctx: RoutingPolicyContext): number[];
+export interface RoutingPolicy {
+  route(options: RoutingOptions): StatefulNode[];
 }

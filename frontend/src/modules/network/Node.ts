@@ -18,3 +18,5 @@ export const DEFAULT_NODE_FIELDS = {
 
 export type CreateNodeFields = Pick<Node, 'label' | 'regionId'>
   & Partial<Pick<Node, 'type'>>;
+
+export type NodeFilters = Partial<Pick<Node, 'type'>>;

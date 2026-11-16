@@ -1,43 +1,36 @@
-import type { Frame } from '@/modules/traffic/Frame';
-import type { RoutingPolicy, RoutingPolicyContext } from '@/modules/routing/RoutingPolicy';
+import type { RoutingOptions, RoutingPolicy } from '@/modules/routing/RoutingPolicy';
 import { shuffle } from '@/modules/util/shuffle';
-import type { Node } from '@/modules/network/Node';
-import { isLinkBusy } from '@/modules/simulation/state/StatefulLink';
+import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
-export class HotPotatoRP implements RoutingPolicy<null> {
-  initState(_: Node, __: RoutingPolicyContext): null {
-    return null;
-  }
+export class HotPotatoRP implements RoutingPolicy {
+  route({
+    thisNode,
+    source,
+    destination,
+  }: RoutingOptions) {
+    const candidates = thisNode
+      .getAdjacentNodes()
+      .filter((node) => node !== source);
 
-  onPacket(frame: Frame, ctx: RoutingPolicyContext) {
-    const senderId = frame.sourceId;
-    const receiver = ctx.network.getNode(frame.destinationId);
-
-    const targetIds = ctx.network
-      .getLinkedNodes(receiver.id)
-      .map((node) => node.id)
-      .filter((id) => id !== senderId);
-
-    if (!targetIds.length) {
-      return [senderId];
+    if (!candidates.length) {
+      return source ? [source] : [];
     }
 
-    if (targetIds.includes(frame.packet.destinationId)) {
-      return [frame.packet.destinationId];
+    if (candidates.includes(destination)) {
+      return [destination];
     }
 
-    const getBufferLength = (targetId: number) => {
-      const link = ctx.network.getLinkBetween(receiver.id, targetId);
+    const getBufferLength = (candidate: StatefulNode) => {
+      const link = thisNode.getLinkTo(candidate);
+      const buffer = thisNode.getBufferTo(candidate);
 
-      const bufferLength = receiver.buffers.to(targetId).length;
-
-      return bufferLength + (isLinkBusy(link, receiver.id) ? 1 : 0);
+      return buffer.length + (link.isBusy ? 1 : 0);
     };
 
-    const targetWithSmallestBufferId = shuffle(targetIds).sort((a, b) => (
+    const bestCandidate = shuffle(candidates).sort((a, b) => (
       getBufferLength(a) - getBufferLength(b)
     ))[0];
 
-    return [targetWithSmallestBufferId];
+    return [bestCandidate];
   }
 };

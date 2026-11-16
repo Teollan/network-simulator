@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { describeEvent } from '@/components/editor/aside/tabs/trace/describeEvent';
 import { Trace, TraceDescription, TraceIcon, TraceLine, TraceTitle } from '@/components/ui/Trace';
-import type { SimulationEvent } from '@/modules/simulation/SimulationEvent';
+import type { SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 
 interface TraceEventListProps {

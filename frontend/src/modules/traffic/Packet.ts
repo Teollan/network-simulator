@@ -1,39 +1,21 @@
-export interface CreatePacketOptions {
-  messageId: number;
+import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
+import type { Message } from '@/modules/traffic/Message';
+
+export interface Packet {
+  id: number;
+
+  message: Message;
+  source: StatefulNode;
+  destination: StatefulNode;
+
   offset: number;
   length: number;
   isLast: boolean;
 
-  sourceId: number;
-  destinationId: number;
   hopLimit: number;
+  cost: number;
 }
 
-export class Packet {
-  private static nextId = 1;
-  readonly id: number;
-
-  readonly messageId: number;
-  readonly offset: number;
-  readonly length: number;
-  readonly isLast: boolean;
-
-  readonly sourceId: number;
-  readonly destinationId: number;
-  readonly hopLimit: number;
-  cost = 0;
-  hops = 0;
-
-  constructor(options: CreatePacketOptions) {
-    this.id = Packet.nextId++;
-
-    this.messageId = options.messageId;
-    this.offset = options.offset;
-    this.length = options.length;
-    this.isLast = options.isLast;
-
-    this.sourceId = options.sourceId;
-    this.destinationId = options.destinationId;
-    this.hopLimit = options.hopLimit;
-  }
+export function byOffset(a: Packet, b: Packet) {
+  return a.offset - b.offset;
 }

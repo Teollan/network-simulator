@@ -3,12 +3,15 @@ import {
   ArrowRight,
   CircleCheck,
   CircleX,
+  ListPlus,
   MailCheck,
   PackagePlus,
+  Radio,
+  Route,
   Send,
   type LucideIcon,
 } from 'lucide-react';
-import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/SimulationEvent';
+import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
 
 export interface EventDescription {
   icon: LucideIcon;
@@ -22,64 +25,89 @@ export const describeEvent = (
 ): EventDescription => {
   switch (event.kind) {
     case SIMULATION_EVENT_KIND.MESSAGE_SENT: {
-      const { message, fromNodeId, toNodeId } = event.data;
+      const { message, source, destination } = event.data;
 
       return {
         icon: Send,
-        title: `message ${message.id} sent ${getLabel(fromNodeId)} → ${getLabel(toNodeId)}`,
+        title: `message ${message.id} sent ${getLabel(source.id)} → ${getLabel(destination.id)}`,
       };
     }
 
     case SIMULATION_EVENT_KIND.MESSAGE_RECEIVED: {
-      const { message, nodeId } = event.data;
+      const { message, thisNode } = event.data;
 
       return {
         icon: MailCheck,
-        title: `message ${message.id} received at ${getLabel(nodeId)}`,
-      };
-    }
-
-    case SIMULATION_EVENT_KIND.PACKET_CREATED: {
-      const { packet } = event.data;
-
-      return {
-        icon: PackagePlus,
-        title: `packet #${packet.id} created at ${getLabel(packet.sourceId)}`,
+        title: `message ${message.id} received at ${getLabel(thisNode.id)}`,
       };
     }
 
     case SIMULATION_EVENT_KIND.PACKET_SENT: {
-      const { packet, sourceId, destinationId } = event.data.frame;
+      const { packet, from, thisNode } = event.data;
+
+      if (!from) {
+        return {
+          icon: PackagePlus,
+          title: `packet #${packet.id} created at ${getLabel(thisNode.id)}`,
+        };
+      }
 
       return {
-        icon: ArrowRight,
-        title: `packet #${packet.id} sent ${getLabel(sourceId)} → ${getLabel(destinationId)}`,
+        icon: Route,
+        title: `packet #${packet.id} routed at ${getLabel(thisNode.id)}`,
       };
     }
 
     case SIMULATION_EVENT_KIND.PACKET_RECEIVED: {
-      const { packet, destinationId } = event.data.frame;
+      const { packet, thisNode } = event.data;
 
-      if (packet.destinationId === destinationId) {
+      if (packet.destination === thisNode) {
         return {
           icon: CircleCheck,
-          title: `packet #${packet.id} delivered to ${getLabel(destinationId)}`,
+          title: `packet #${packet.id} delivered to ${getLabel(thisNode.id)}`,
         };
       }
 
       return {
         icon: ArrowDownToLine,
-        title: `packet #${packet.id} received at ${getLabel(destinationId)}`,
+        title: `packet #${packet.id} received at ${getLabel(thisNode.id)}`,
       };
     }
 
     case SIMULATION_EVENT_KIND.PACKET_DROPPED: {
-      const { packet, nodeId, reason } = event.data;
+      const { packet, thisNode, reason } = event.data;
 
       return {
         icon: CircleX,
-        title: `packet #${packet.id} dropped at ${getLabel(nodeId)}: ${reason}`,
+        title: `packet #${packet.id} dropped at ${getLabel(thisNode.id)}: ${reason}`,
         isError: true,
+      };
+    }
+
+    case SIMULATION_EVENT_KIND.FRAME_FORWARDED: {
+      const { packet, source, destination } = event.data.frame;
+
+      return {
+        icon: ListPlus,
+        title: `packet #${packet.id} queued ${getLabel(source.id)} → ${getLabel(destination.id)}`,
+      };
+    }
+
+    case SIMULATION_EVENT_KIND.FRAME_SENT: {
+      const { packet, source, destination } = event.data.frame;
+
+      return {
+        icon: Radio,
+        title: `packet #${packet.id} transmitted ${getLabel(source.id)} → ${getLabel(destination.id)}`,
+      };
+    }
+
+    case SIMULATION_EVENT_KIND.FRAME_RECEIVED: {
+      const { packet, source, destination } = event.data.frame;
+
+      return {
+        icon: ArrowRight,
+        title: `packet #${packet.id} arrived ${getLabel(source.id)} → ${getLabel(destination.id)}`,
       };
     }
   }

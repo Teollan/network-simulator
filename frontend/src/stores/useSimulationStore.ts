@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
+import { NODE_TYPE } from '@/modules/network/Node';
 import { createRoutingPolicy } from '@/modules/routing/createRoutingPolicy';
 import { ROUTING_POLICY, type RoutingPolicyId } from '@/modules/routing/routing.constants';
 import { Simulation } from '@/modules/simulation/Simulation';
-import { SIMULATION_EVENT_KIND } from '@/modules/simulation/SimulationEvent';
 import { DEFAULT_RUN_UNTIL } from '@/modules/simulation/simulation.constants';
 import { summarizeTrace } from '@/modules/simulation/summarizeTrace';
 import { useNetworkStore } from '@/stores/useNetworkStore';
@@ -46,26 +46,26 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
 
     const { network } = networkLayout;
     const { routingPolicyId, runUntil } = get().simulationConfig;
-    const source = network.getNodes().at(0);
-    const destination = network.getNodes().at(-1);
+    const workstations = network.getNodes({ type: NODE_TYPE.WORKSTATION });
+    const source = workstations.at(0);
+    const destination = workstations.at(-1);
 
     if (!source || !destination) {
       return;
     }
 
-    const simulation = new Simulation(network, createRoutingPolicy(routingPolicyId));
-
-    simulation.schedule({
-      kind: SIMULATION_EVENT_KIND.MESSAGE_SENT,
-      data: {
-        fromNodeId: source.id,
-        toNodeId: destination.id,
+    const simulation = new Simulation({
+      network,
+      routingPolicy: createRoutingPolicy(routingPolicyId),
+      traffic: [{
         message: {
           id: 1,
-          length: PLACEHOLDER_MESSAGE_LENGTH,
+          size: PLACEHOLDER_MESSAGE_LENGTH,
         },
-      },
-      time: 0,
+        sourceId: source.id,
+        destinationId: destination.id,
+        time: 0,
+      }],
     });
 
     simulation.run(runUntil);
