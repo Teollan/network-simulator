@@ -95,3 +95,15 @@ export type RelativeSimulationEvent<K extends SimulationEventKind = SimulationEv
 export const byTimeAndSerial = (a: SimulationEvent, b: SimulationEvent) => (
   a.time < b.time || (a.time === b.time && a.serial < b.serial)
 );
+
+export const isEventOfKind = <K extends SimulationEventKind>(...kinds: K[]) => {
+  return (event: SimulationEvent): event is Extract<SimulationEvent, { kind: K }> => (
+    kinds.some((kind) => kind === event.kind)
+  );
+};
+
+export const hasEventHappenedBy = (time: number) => {
+  return (event: SimulationEvent) => (
+    event.time <= time
+  );
+};

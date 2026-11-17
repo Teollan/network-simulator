@@ -4,6 +4,7 @@ export const DEFAULT_WEIGHT_POOL = [3, 5, 7, 8, 11, 12, 15, 18, 21, 25];
 export const DEFAULT_ROUTERS_PER_REGION = 9;
 export const DEFAULT_CONNECTIVITY_DEGREE = 3.5;
 export const DEFAULT_WORKSTATION_INTERVAL = 3;
+export const DEFAULT_HALF_DUPLEX_SHARE = 0.25;
 
 export const DEFAULT_NETWORK_RECIPE: NetworkRecipe = {
   actions: [
@@ -70,6 +71,10 @@ export const DEFAULT_NETWORK_RECIPE: NetworkRecipe = {
     {
       kind: ACTION.ASSIGN_LINK_WEIGHTS,
       pool: DEFAULT_WEIGHT_POOL,
+    },
+    {
+      kind: ACTION.ASSIGN_LINK_TYPE,
+      halfDuplexShare: DEFAULT_HALF_DUPLEX_SHARE,
     },
     // TODO: add proper default BERs
     {

@@ -1,7 +1,10 @@
 import { getStraightPath, useInternalNode, type EdgeProps } from '@xyflow/react';
-import { getNodeCenter } from '@/components/editor/canvas/edge/getNodeCenter';
+import { getOutlineSegment } from '@/components/editor/canvas/edge/getOutlineSegment';
+import type { FloatingEdgeType } from '@/components/editor/canvas/edge/edge.types';
 
-function FloatingEdge({ id, source, target, markerEnd, style }: EdgeProps) {
+const PACKET_RADIUS = 10; // px
+
+function FloatingEdge({ id, source, target, markerEnd, style, data }: EdgeProps<FloatingEdgeType>) {
   const sourceNode = useInternalNode(source);
   const targetNode = useInternalNode(target);
 
@@ -9,24 +12,42 @@ function FloatingEdge({ id, source, target, markerEnd, style }: EdgeProps) {
     return null;
   }
 
-  const sourceCenter = getNodeCenter(sourceNode);
-  const targetCenter = getNodeCenter(targetNode);
+  const segment = getOutlineSegment(sourceNode, targetNode);
+
+  if (!segment) {
+    return null;
+  }
+
+  const { start, end } = segment;
 
   const [edgePath] = getStraightPath({
-    sourceX: sourceCenter.x,
-    sourceY: sourceCenter.y,
-    targetX: targetCenter.x,
-    targetY: targetCenter.y,
+    sourceX: start.x,
+    sourceY: start.y,
+    targetX: end.x,
+    targetY: end.y,
   });
 
   return (
-    <path
-      id={id}
-      className="react-flow__edge-path"
-      d={edgePath}
-      markerEnd={markerEnd}
-      style={style}
-    />
+    <>
+      <path
+        id={id}
+        className="react-flow__edge-path"
+        d={edgePath}
+        markerEnd={markerEnd}
+        style={style}
+      />
+
+      {data?.packets?.map(({ id: packetId, progress }) => (
+        <circle
+          key={packetId}
+          className="fill-green-500 stroke-background"
+          cx={start.x + (end.x - start.x) * progress}
+          cy={start.y + (end.y - start.y) * progress}
+          r={PACKET_RADIUS}
+          strokeWidth={1.5}
+        />
+      ))}
+    </>
   );
 }
 

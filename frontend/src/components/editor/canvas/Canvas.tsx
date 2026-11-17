@@ -20,6 +20,7 @@ import { networkLinkToFlowEdge } from '@/modules/graph/model/networkLinkToFlowEd
 import { EDGE_TYPE } from '@/components/editor/canvas/edge/edge.constants';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { NODE_TYPES } from '@/components/editor/canvas/node/node.constants';
+import { PacketsSync } from '@/components/editor/canvas/PacketsSync';
 
 const EDGE_TYPES = {
   [EDGE_TYPE.GROUND_CONNECTION]: FloatingEdge,
@@ -80,6 +81,8 @@ const CanvasFlow = () => {
         fitView
       >
         <Background />
+
+        <PacketsSync setEdges={setEdges} />
 
         <Controls />
       </ReactFlow>

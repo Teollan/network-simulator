@@ -1,4 +1,5 @@
 import { assignBitErrorRate } from '@/modules/network/builder/actions/assignBitErrorRate';
+import { assignLinkType } from '@/modules/network/builder/actions/assignLinkType';
 import { assignLinkWeights } from '@/modules/network/builder/actions/assignLinkWeights';
 import { attachWorkstations } from '@/modules/network/builder/actions/attachWorkstations';
 import { linkInsideRegion } from '@/modules/network/builder/actions/linkInsideRegion';
@@ -29,6 +30,9 @@ export function makeNetwork({ actions }: NetworkRecipe) {
         break;
       case NETWORK_BUILDER_ACTION.ASSIGN_BIT_ERROR_RATE:
         assignBitErrorRate(network, action);
+        break;
+      case NETWORK_BUILDER_ACTION.ASSIGN_LINK_TYPE:
+        assignLinkType(network, action);
         break;
     }
   }

@@ -10,8 +10,10 @@ export function handleLinkAcquired(
   const link = source.getLinkTo(destination);
 
   if (link.isBusy) {
-    // TODO: this feels wrong
-    // throw Error(`Link between nodes [${source.label}] and [${destination.label}] is busy!`);
+    // TODO: naming - LINK_ACQUIRED reads like it always acquires, but it may not:
+    // both ends of a shared half-duplex line can request it at the same moment,
+    // and the loser finds the line busy and defers, like carrier sense in CSMA.
+    // Its frame stays buffered and LINK_RELEASED hands the line over later.
     return;
   }
 

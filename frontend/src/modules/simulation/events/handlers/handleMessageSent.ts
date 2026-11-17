@@ -15,7 +15,7 @@ export function handleMessageSent(
 
   const packets = simulation.packets.splitMessage(message, source, destination);
 
-  simulation.schedule(packets.map((packet) => ({
+  simulation.schedule(...packets.map((packet) => ({
     kind: SIMULATION_EVENT_KIND.PACKET_SENT,
     data: {
       from: null,

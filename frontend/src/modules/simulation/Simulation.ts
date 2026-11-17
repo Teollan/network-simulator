@@ -118,9 +118,7 @@ export class Simulation {
     }
   }
 
-  schedule(data: RelativeSimulationEvent | RelativeSimulationEvent[]): void {
-    const events = Array.isArray(data) ? data : [data];
-
+  schedule(...events: RelativeSimulationEvent[]): void {
     for (const { eta, ...event } of events) {
       if (eta < 0) {
         throw Error(`Event ${event.kind} scheduled with ${this.clock + eta}, before the clock at ${this.clock}!`);
