@@ -1,5 +1,5 @@
 import type { ElkNode } from 'elkjs';
-import type { Node } from '@/modules/network/Node';
+import type { Node } from '@/modules/network/node/Node';
 import { NODE_SIZE } from '@/components/editor/canvas/node/node.constants';
 
 export const networkNodeToElkNode = (node: Node): ElkNode => ({

@@ -1,4 +1,6 @@
-import { DEFAULT_NODE_FIELDS, type CreateNodeFields, type Node, type NodeFilters } from '@/modules/network/Node';
+import type { Node } from '@/modules/network/node/Node';
+import { DEFAULT_NODE_FIELDS } from '@/modules/network/node/Node.constants';
+import type { CreateNodeFields, NodeFilters, UpdateNodeFields } from '@/modules/network/node/Node.typedefs';
 import { DEFAULT_LINK_FIELDS, type CreateLinkFields, type Link, type LinkFilters, type UpdateLinkFields } from '@/modules/network/Link';
 import { getLinkComplement, isLinkWith } from '@/modules/network/network.helpers';
 import type { CreateRegionFields, Region } from '@/modules/network/Region';
@@ -112,6 +114,19 @@ export class Network {
     nodes.push(...created);
 
     return created;
+  }
+
+  updateManyNodes(records: UpdateNodeFields[]) {
+    const { nodes } = this;
+
+    for (const fields of records) {
+      const index = nodes.findIndex((node) => node.id === fields.id);
+
+      nodes[index] = {
+        ...nodes[index],
+        ...fields,
+      };
+    }
   }
 
   // === LINK === 

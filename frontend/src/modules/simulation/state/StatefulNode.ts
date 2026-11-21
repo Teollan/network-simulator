@@ -1,4 +1,5 @@
-import type { Node, NodeType } from '@/modules/network/Node';
+import type { Node } from '@/modules/network/node/Node';
+import type { BufferSize, NodeType } from '@/modules/network/node/Node.typedefs';
 import type { StatefulLink } from '@/modules/simulation/state/StatefulLink';
 import type { Frame } from '@/modules/traffic/Frame';
 import type { Message } from '@/modules/traffic/Message';
@@ -10,13 +11,14 @@ interface DataByDestination {
   buffer: Queue<Frame>;
 }
 
-export class StatefulNode {
+export class StatefulNode implements Node {
   readonly id: number;
   readonly label: string;
   readonly regionId: number;
   readonly type: NodeType;
+  readonly bufferSize: BufferSize;
 
-  private byDestination = new Map<StatefulNode, DataByDestination>();
+  private dataByDestination = new Map<StatefulNode, DataByDestination>();
   private accumulatorsByMessage = new Map<Message, Packet[]>();
 
   constructor(node: Node) {
@@ -24,25 +26,28 @@ export class StatefulNode {
     this.label = node.label;
     this.regionId = node.regionId;
     this.type = node.type;
+    this.bufferSize = node.bufferSize;
   }
 
-  addLinkTo(key: StatefulNode, link: StatefulLink) {
-    if (this.byDestination.has(key)) {
-      throw Error(`Link between nodes [${this.id}] and [${key.id}] is already defined!`);
+  addLinkTo(destination: StatefulNode, link: StatefulLink) {
+    if (this.dataByDestination.has(destination)) {
+      throw Error(`Link between nodes [${this.id}] and [${destination.id}] is already defined!`);
     }
 
-    this.byDestination.set(key, {
+    const bufferSize = this.bufferSize.overrides?.[destination.id] ?? this.bufferSize.default;
+
+    this.dataByDestination.set(destination, {
       link,
-      buffer: new Queue<Frame>(),
+      buffer: new Queue<Frame>(bufferSize),
     });
   }
 
   getAdjacentNodes(): StatefulNode[] {
-    return [...this.byDestination.keys()];
+    return [...this.dataByDestination.keys()];
   }
 
   getLinkTo(node: StatefulNode): StatefulLink<boolean> {
-    const data = this.byDestination.get(node);
+    const data = this.dataByDestination.get(node);
 
     if (!data) {
       throw Error('Nodes are not connected!');
@@ -52,7 +57,7 @@ export class StatefulNode {
   }
 
   getBufferTo(node: StatefulNode): Queue<Frame> {
-    const data = this.byDestination.get(node);
+    const data = this.dataByDestination.get(node);
 
     if (!data) {
       throw Error('Nodes are not connected!');

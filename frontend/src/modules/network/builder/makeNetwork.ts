@@ -1,3 +1,4 @@
+import { assignBufferSize } from '@/modules/network/builder/actions/assignBufferSize';
 import { assignBitErrorRate } from '@/modules/network/builder/actions/assignBitErrorRate';
 import { assignLinkType } from '@/modules/network/builder/actions/assignLinkType';
 import { assignLinkWeights } from '@/modules/network/builder/actions/assignLinkWeights';
@@ -33,6 +34,9 @@ export function makeNetwork({ actions }: NetworkRecipe) {
         break;
       case NETWORK_BUILDER_ACTION.ASSIGN_LINK_TYPE:
         assignLinkType(network, action);
+        break;
+      case NETWORK_BUILDER_ACTION.ASSIGN_BUFFER_SIZE:
+        assignBufferSize(network, action);
         break;
     }
   }

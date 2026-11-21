@@ -24,6 +24,7 @@ export type SimulationEventKind = typeof SIMULATION_EVENT_KIND[keyof typeof SIMU
 export const PACKET_DROP_REASON = {
   HOP_LIMIT: 'hop-limit',
   NO_ROUTE: 'no-route',
+  BUFFER_OVERFLOW: 'buffer-overflow',
 } as const;
 
 export type PacketDropReason = typeof PACKET_DROP_REASON[keyof typeof PACKET_DROP_REASON];

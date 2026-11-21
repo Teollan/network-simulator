@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { Network } from '@/modules/network/Network';
 import { LINK_TYPE, type LinkType } from '@/modules/network/Link';
-import { NODE_TYPE } from '@/modules/network/Node';
+import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import type { RoutingPolicy } from '@/modules/routing/RoutingPolicy';
 import { Simulation } from '@/modules/simulation/Simulation';
-import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import { PACKET_DROP_REASON, SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
 
 const MESSAGE_SIZE = 30;
 const PACKETS_PER_MESSAGE = 3;
@@ -205,5 +205,87 @@ describe('Simulation: A <-> B exchange', () => {
 
       expect(halfDuplex.time).toBeGreaterThan(fullDuplex.time);
     });
+  });
+});
+
+describe('Simulation: buffer overflow', () => {
+  // A -> B only, with a single-frame output queue at A: all 3 packets reach
+  // A's interface at the same time, so only the first one fits
+  const runOverflow = () => {
+    const network = new Network();
+    const region = network.createRegion({ label: 'R' });
+
+    const [a, b] = network.createManyNodes([
+      {
+        label: 'A',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+        bufferSize: { default: 1 },
+      },
+      {
+        label: 'B',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+    ]);
+
+    network.createManyLinks([
+      {
+        sourceId: a.id,
+        targetId: b.id,
+      },
+    ]);
+
+    const simulation = new Simulation({
+      network,
+      routingPolicy: directRouting,
+      traffic: [
+        {
+          message: {
+            id: 1,
+            size: MESSAGE_SIZE,
+          },
+          sourceId: a.id,
+          destinationId: b.id,
+          time: 0,
+        },
+      ],
+    });
+
+    simulation.run();
+
+    return simulation;
+  };
+
+  it('should drop packets that do not fit into the output queue instead of throwing', () => {
+    expect(() => runOverflow()).not.toThrow();
+    expect(runOverflow().pendingEventCount).toBe(0);
+  });
+
+  it('should drop the overflowing packets at the source with BUFFER_OVERFLOW', () => {
+    const dropped = ofKind(runOverflow().trace, SIMULATION_EVENT_KIND.PACKET_DROPPED);
+
+    expect(dropped).toHaveLength(PACKETS_PER_MESSAGE - 1);
+
+    for (const { data } of dropped) {
+      expect(data.reason).toBe(PACKET_DROP_REASON.BUFFER_OVERFLOW);
+      expect(data.thisNode.label).toBe('A');
+    }
+  });
+
+  it('should account for every packet as either delivered or dropped', () => {
+    const { trace } = runOverflow();
+
+    const delivered = ofKind(trace, SIMULATION_EVENT_KIND.PACKET_RECEIVED).filter(({ data }) => (
+      data.packet.destination === data.thisNode
+    ));
+    const dropped = ofKind(trace, SIMULATION_EVENT_KIND.PACKET_DROPPED);
+
+    expect(delivered).toHaveLength(1);
+    expect(delivered.length + dropped.length).toBe(PACKETS_PER_MESSAGE);
+  });
+
+  it('should not reassemble a message that lost packets', () => {
+    expect(ofKind(runOverflow().trace, SIMULATION_EVENT_KIND.MESSAGE_RECEIVED)).toHaveLength(0);
   });
 });

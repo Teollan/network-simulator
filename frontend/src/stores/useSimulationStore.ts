@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
-import { NODE_TYPE } from '@/modules/network/Node';
+import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import { createRoutingPolicy } from '@/modules/routing/createRoutingPolicy';
 import { ROUTING_POLICY, type RoutingPolicyId } from '@/modules/routing/routing.constants';
 import { Simulation } from '@/modules/simulation/Simulation';

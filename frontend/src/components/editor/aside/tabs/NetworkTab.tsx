@@ -1,7 +1,7 @@
 import { RefreshCw } from 'lucide-react';
 import { AsideSection } from '@/components/editor/aside/AsideSection';
 import { Button } from '@/components/ui/Button';
-import { NODE_TYPE } from '@/modules/network/Node';
+import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 
 export const NetworkTab = () => {

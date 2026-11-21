@@ -8,6 +8,7 @@ export const NETWORK_BUILDER_ACTION = {
   ASSIGN_LINK_WEIGHTS: 'assign-link-weights',
   ASSIGN_BIT_ERROR_RATE: 'assign-bit-error-rate',
   ASSIGN_LINK_TYPE: 'assign-link-type',
+  ASSIGN_BUFFER_SIZE: 'assign-buffer-size',
 } as const;
 
 export type NetworkBuilderActionKind = typeof NETWORK_BUILDER_ACTION[keyof typeof NETWORK_BUILDER_ACTION];
@@ -45,6 +46,11 @@ export type NetworkBuilderAction =
   | {
     kind: typeof NETWORK_BUILDER_ACTION.ASSIGN_LINK_TYPE;
     halfDuplexShare: number;
+    medium?: LinkMedium
+  }
+  | {
+    kind: typeof NETWORK_BUILDER_ACTION.ASSIGN_BUFFER_SIZE;
+    pool: number[];
     medium?: LinkMedium
   };
 

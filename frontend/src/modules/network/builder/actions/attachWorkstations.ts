@@ -1,6 +1,6 @@
 import { NETWORK_BUILDER_ACTION, type TopologyRecipeStepOf } from '@/modules/network/builder/NetworkRecipe';
 import type { Network } from '@/modules/network/Network';
-import { NODE_TYPE } from '@/modules/network/Node';
+import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 
 type AttachWorkstationsStep = TopologyRecipeStepOf<typeof NETWORK_BUILDER_ACTION.ATTACH_WORKSTATIONS>;
 
