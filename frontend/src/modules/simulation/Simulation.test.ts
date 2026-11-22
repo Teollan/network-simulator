@@ -5,9 +5,16 @@ import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import type { RoutingPolicy } from '@/modules/routing/RoutingPolicy';
 import { Simulation } from '@/modules/simulation/Simulation';
 import { PACKET_DROP_REASON, SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import type { PacketFactoryConfig } from '@/modules/traffic/PacketFactory';
 
 const MESSAGE_SIZE = 30;
-const PACKETS_PER_MESSAGE = 3;
+
+const PACKETS: PacketFactoryConfig = {
+  maxSize: 10,
+  maxHops: 10,
+};
+
+const PACKETS_PER_MESSAGE = Math.ceil(MESSAGE_SIZE / PACKETS.maxSize);
 
 // deterministic stub, so routing randomness can't leak into simulation tests:
 // forward straight to the destination if it is adjacent, otherwise give up
@@ -45,6 +52,7 @@ const runExchange = (linkType: LinkType) => {
   const simulation = new Simulation({
     network,
     routingPolicy: directRouting,
+    packets: PACKETS,
     traffic: [
       {
         message: {
@@ -109,10 +117,6 @@ const getTransmissions = (trace: SimulationEvent[]): Transmission[] => {
 };
 
 const overlaps = (x: Transmission, y: Transmission) => x.start < y.end && y.start < x.end;
-
-// TODO: cover the hop limit, e.g. an A -> B -> C chain with maxHops: 1
-// should drop at B with PACKET_DROP_REASON.HOP_LIMIT and never reach C;
-// needs MAX_HOPS to become a SimulationConfig option instead of a constant
 
 describe('Simulation: A <-> B exchange', () => {
   describe.each([LINK_TYPE.FULL_DUPLEX, LINK_TYPE.HALF_DUPLEX])('over a %s link', (linkType) => {
@@ -239,6 +243,7 @@ describe('Simulation: buffer overflow', () => {
     const simulation = new Simulation({
       network,
       routingPolicy: directRouting,
+      packets: PACKETS,
       traffic: [
         {
           message: {
@@ -287,5 +292,109 @@ describe('Simulation: buffer overflow', () => {
 
   it('should not reassemble a message that lost packets', () => {
     expect(ofKind(runOverflow().trace, SIMULATION_EVENT_KIND.MESSAGE_RECEIVED)).toHaveLength(0);
+  });
+});
+
+describe('Simulation: hop limit', () => {
+  // static next hops for the A -> B -> C chain, so the test doesn't depend on a real routing policy
+  const NEXT_HOP_BY_LABEL: Record<string, string> = {
+    A: 'B',
+    B: 'C',
+  };
+
+  const chainRouting: RoutingPolicy = {
+    route: ({ thisNode }) => (
+      thisNode.getAdjacentNodes().filter((node) => node.label === NEXT_HOP_BY_LABEL[thisNode.label])
+    ),
+  };
+
+  // A -> B -> C, with B as a transit router two hops away from the destination
+  const runChain = (maxHops: number) => {
+    const network = new Network();
+    const region = network.createRegion({ label: 'R' });
+
+    const [a, b, c] = network.createManyNodes([
+      {
+        label: 'A',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+      {
+        label: 'B',
+        regionId: region.id,
+        type: NODE_TYPE.ROUTER,
+      },
+      {
+        label: 'C',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+    ]);
+
+    network.createManyLinks([
+      {
+        sourceId: a.id,
+        targetId: b.id,
+      },
+      {
+        sourceId: b.id,
+        targetId: c.id,
+      },
+    ]);
+
+    const simulation = new Simulation({
+      network,
+      routingPolicy: chainRouting,
+      packets: {
+        ...PACKETS,
+        maxHops,
+      },
+      traffic: [
+        {
+          message: {
+            id: 1,
+            size: MESSAGE_SIZE,
+          },
+          sourceId: a.id,
+          destinationId: c.id,
+          time: 0,
+        },
+      ],
+    });
+
+    simulation.run();
+
+    return simulation;
+  };
+
+  it('should drop every packet at the transit router when maxHops is 1', () => {
+    const { trace, pendingEventCount } = runChain(1);
+    const dropped = ofKind(trace, SIMULATION_EVENT_KIND.PACKET_DROPPED);
+
+    expect(pendingEventCount).toBe(0);
+    expect(dropped).toHaveLength(PACKETS_PER_MESSAGE);
+
+    for (const { data } of dropped) {
+      expect(data.reason).toBe(PACKET_DROP_REASON.HOP_LIMIT);
+      expect(data.thisNode.label).toBe('B');
+    }
+  });
+
+  it('should never forward a packet past the transit router when maxHops is 1', () => {
+    const { trace } = runChain(1);
+
+    const reachedC = ofKind(trace, SIMULATION_EVENT_KIND.PACKET_RECEIVED).filter(({ data }) => (
+      data.thisNode.label === 'C'
+    ));
+
+    expect(reachedC).toHaveLength(0);
+    expect(ofKind(trace, SIMULATION_EVENT_KIND.MESSAGE_RECEIVED)).toHaveLength(0);
+  });
+
+  it('should deliver the message when maxHops covers both hops', () => {
+    const { trace } = runChain(2);
+
+    expect(ofKind(trace, SIMULATION_EVENT_KIND.PACKET_DROPPED)).toHaveLength(0);
+    expect(ofKind(trace, SIMULATION_EVENT_KIND.MESSAGE_RECEIVED).map(({ data }) => data.thisNode.label)).toEqual(['C']);
   });
 });

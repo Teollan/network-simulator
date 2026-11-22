@@ -11,6 +11,8 @@ import { useSimulationStore } from '@/stores/useSimulationStore';
 
 const ROUTING_POLICY_IDS = Object.values(ROUTING_POLICY) as RoutingPolicyId[];
 
+const isPositiveInteger = (value: number) => Number.isInteger(value) && value >= 1;
+
 export const SimulationTab = () => {
   const { simulationConfig, setSimulationConfig, runSimulation } = useSimulationStore();
   const { networkLayout } = useNetworkStore();
@@ -61,6 +63,44 @@ export const SimulationTab = () => {
           step="any"
           defaultValue={simulationConfig.runUntil}
           onChange={onNumberChange((runUntil) => setSimulationConfig({ runUntil }))}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="max-packet-size">
+          MTU, bytes
+        </Label>
+
+        <Input
+          id="max-packet-size"
+          type="number"
+          min={1}
+          step={1}
+          defaultValue={simulationConfig.maxPacketSize}
+          onChange={onNumberChange((maxPacketSize) => {
+            if (isPositiveInteger(maxPacketSize)) {
+              setSimulationConfig({ maxPacketSize });
+            }
+          })}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="max-hops">
+          TTL, hops
+        </Label>
+
+        <Input
+          id="max-hops"
+          type="number"
+          min={1}
+          step={1}
+          defaultValue={simulationConfig.maxHops}
+          onChange={onNumberChange((maxHops) => {
+            if (isPositiveInteger(maxHops)) {
+              setSimulationConfig({ maxHops });
+            }
+          })}
         />
       </div>
 

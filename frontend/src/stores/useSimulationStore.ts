@@ -4,7 +4,7 @@ import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import { createRoutingPolicy } from '@/modules/routing/createRoutingPolicy';
 import { ROUTING_POLICY, type RoutingPolicyId } from '@/modules/routing/routing.constants';
 import { Simulation } from '@/modules/simulation/Simulation';
-import { DEFAULT_RUN_UNTIL } from '@/modules/simulation/simulation.constants';
+import { DEFAULT_MAX_HOPS, DEFAULT_MAX_PACKET_SIZE, DEFAULT_RUN_UNTIL } from '@/modules/simulation/simulation.constants';
 import { summarizeTrace } from '@/modules/simulation/summarizeTrace';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { useTraceStore } from '@/stores/useTraceStore';
@@ -15,6 +15,8 @@ const PLACEHOLDER_MESSAGE_LENGTH = 30;
 export interface SimulationConfig {
   routingPolicyId: RoutingPolicyId;
   runUntil: number;
+  maxPacketSize: number;
+  maxHops: number;
 }
 
 interface SimulationStore {
@@ -28,6 +30,8 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
   simulationConfig: {
     routingPolicyId: ROUTING_POLICY.HOT_POTATO,
     runUntil: DEFAULT_RUN_UNTIL,
+    maxPacketSize: DEFAULT_MAX_PACKET_SIZE,
+    maxHops: DEFAULT_MAX_HOPS,
   },
 
   setSimulationConfig: (config) => set(({ simulationConfig }) => ({
@@ -45,7 +49,7 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
     }
 
     const { network } = networkLayout;
-    const { routingPolicyId, runUntil } = get().simulationConfig;
+    const { routingPolicyId, runUntil, maxPacketSize, maxHops } = get().simulationConfig;
     const workstations = network.getNodes({ type: NODE_TYPE.WORKSTATION });
     const source = workstations.at(0);
     const destination = workstations.at(-1);
@@ -57,6 +61,10 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
     const simulation = new Simulation({
       network,
       routingPolicy: createRoutingPolicy(routingPolicyId),
+      packets: {
+        maxSize: maxPacketSize,
+        maxHops,
+      },
       traffic: [{
         message: {
           id: 1,

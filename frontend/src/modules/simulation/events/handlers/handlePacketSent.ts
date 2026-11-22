@@ -26,6 +26,8 @@ export function handlePacketSent(
       },
       eta: 0,
     });
+
+    return;
   }
 
   const frames = destinations.map((destination) => ({

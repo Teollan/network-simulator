@@ -21,11 +21,8 @@ import { handleLinkAcquired } from '@/modules/simulation/events/handlers/handleL
 import { handleLinkReleased } from '@/modules/simulation/events/handlers/handleLinkReleased';
 import { Serial } from '@/modules/util/Serial';
 import type { SimulationEventHandler } from '@/modules/simulation/events/handlers/handlers.typedef';
-import { PacketFactory } from '@/modules/traffic/PacketFactory';
+import { PacketFactory, type PacketFactoryConfig } from '@/modules/traffic/PacketFactory';
 import type { Message } from '@/modules/traffic/Message';
-
-const MAX_PACKET_LENGTH = 10;
-const MAX_HOPS = 10;
 
 interface TrafficDTO {
   message: Message;
@@ -36,6 +33,7 @@ interface TrafficDTO {
 
 export interface SimulationConfig {
   network: Network;
+  packets: PacketFactoryConfig;
   routingPolicy: RoutingPolicy;
   traffic: TrafficDTO[];
 }
@@ -71,10 +69,7 @@ export class Simulation {
     this.network = new StatefulNetwork(config.network);
     this.routing = config.routingPolicy;
 
-    this.packets = new PacketFactory({
-      maxSize: MAX_PACKET_LENGTH,
-      maxHops: MAX_HOPS,
-    });
+    this.packets = new PacketFactory(config.packets);
 
     for (const item of config.traffic) {
       this.schedule({
