@@ -1,4 +1,7 @@
-import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 
 export interface TraceSummary {
   eventCount: number;

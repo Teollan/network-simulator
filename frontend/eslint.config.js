@@ -52,6 +52,17 @@ export default defineConfig([
         ExportDeclaration: { consistent: true },
       }],
       "@stylistic/object-property-newline": ["error", { allowAllPropertiesOnSameLine: false }],
+      "@stylistic/no-trailing-spaces": "error",
+      "@stylistic/exp-list-style": ["error", {
+        singleLine: { maxItems: 1 },
+        overrides: {
+          "()": "off",
+          "[]": "off",
+          "{}": "off",
+          "<>": "off",
+          ImportDeclaration: { singleLine: { spacing: "always", maxItems: 1 } },
+        },
+      }],
     },
     ignores: ["dist/**", "node_modules/**"],
   },

@@ -1,15 +1,36 @@
-import { Pause, Play, RefreshCw, SkipBack, SkipForward, StepBack, StepForward, Zap } from 'lucide-react';
+import {
+  Pause,
+  Play,
+  RefreshCw,
+  SkipBack,
+  SkipForward,
+  StepBack,
+  StepForward,
+  Zap,
+} from 'lucide-react';
 import { PLAYBACK_SPEEDS } from '@/components/editor/toolbar/toolbar.constants';
 import { Button } from '@/components/ui/Button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 import { Separator } from '@/components/ui/Separator';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { usePlaybackStore } from '@/stores/usePlaybackStore';
 import { useSimulationStore } from '@/stores/useSimulationStore';
 
 export const Toolbar = () => {
-  const { networkLayout, generateNetwork, isGenerating } = useNetworkStore();
+  const {
+    networkLayout,
+    generateNetwork,
+    isGenerating,
+  } = useNetworkStore();
+
   const { runSimulation } = useSimulationStore();
+
   const {
     timeline,
     isPlaying,

@@ -1,7 +1,14 @@
 import type { Network } from '@/modules/network/Network';
-import { getLinkComplement, isLinkWith } from '@/modules/network/network.helpers';
+import {
+  getLinkComplement,
+  isLinkWith,
+} from '@/modules/network/network.helpers';
 import { NODE_TYPE } from '@/modules/network/node/Node.constants';
-import { makeStatefulLink, type IsBusy, type StatefulLink } from '@/modules/simulation/state/StatefulLink';
+import {
+  makeStatefulLink,
+  type IsBusy,
+  type StatefulLink,
+} from '@/modules/simulation/state/StatefulLink';
 import { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
 export class StatefulNetwork {

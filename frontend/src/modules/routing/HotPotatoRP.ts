@@ -1,13 +1,16 @@
-import type { RoutingOptions, RoutingPolicy } from '@/modules/routing/RoutingPolicy';
-import { shuffle } from '@/modules/util/shuffle';
+import type {
+  RoutingOptions,
+  RoutingPolicy,
+} from '@/modules/routing/RoutingPolicy';
+import type { Simulation } from '@/modules/simulation/Simulation';
 import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
 export class HotPotatoRP implements RoutingPolicy {
-  route({
-    thisNode,
-    source,
-    destination,
-  }: RoutingOptions) {
+  route(
+    options: RoutingOptions,
+    simulation: Simulation) {
+    const { thisNode, source, destination } = options;
+
     const candidates = thisNode
       .getAdjacentNodes()
       .filter((node) => node !== source);
@@ -27,7 +30,7 @@ export class HotPotatoRP implements RoutingPolicy {
       return buffer.length + (link.isBusy ? 1 : 0);
     };
 
-    const bestCandidate = shuffle(candidates).sort((a, b) => (
+    const bestCandidate = simulation.random.shuffle(candidates).sort((a, b) => (
       getBufferLength(a) - getBufferLength(b)
     ))[0];
 

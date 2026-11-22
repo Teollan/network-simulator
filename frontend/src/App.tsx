@@ -10,7 +10,7 @@ function App() {
         position="bottom-right"
         offset={{
           bottom: 64,
-          right: 16, 
+          right: 16,
         }}
       />
     </>

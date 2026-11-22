@@ -1,6 +1,12 @@
 import { useMemo } from 'react';
 import { describeEvent } from '@/components/editor/aside/tabs/trace/describeEvent';
-import { Trace, TraceDescription, TraceIcon, TraceLine, TraceTitle } from '@/components/ui/Trace';
+import {
+  Trace,
+  TraceDescription,
+  TraceIcon,
+  TraceLine,
+  TraceTitle,
+} from '@/components/ui/Trace';
 import type { SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 
@@ -28,7 +34,11 @@ export const TraceEventList = ({ events }: TraceEventListProps) => {
   return (
     <Trace>
       {events.map((event, idx) => {
-        const { icon: Icon, title, isError } = describeEvent(event, getLabel);
+        const {
+          icon: Icon,
+          title,
+          isError,
+        } = describeEvent(event, getLabel);
 
         return (
           <TraceLine

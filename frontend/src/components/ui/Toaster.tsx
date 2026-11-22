@@ -1,6 +1,15 @@
 import type { CSSProperties } from 'react';
-import { CircleCheck, Info, LoaderCircle, OctagonX, TriangleAlert } from 'lucide-react';
-import { Toaster as Sonner, type ToasterProps } from 'sonner';
+import {
+  CircleCheck,
+  Info,
+  LoaderCircle,
+  OctagonX,
+  TriangleAlert,
+} from 'lucide-react';
+import {
+  Toaster as Sonner,
+  type ToasterProps,
+} from 'sonner';
 
 const Toaster = ({ ...props }: ToasterProps) => (
   <Sonner

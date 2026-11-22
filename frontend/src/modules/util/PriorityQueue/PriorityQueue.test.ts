@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import { PriorityQueue } from '@/modules/util/PriorityQueue/PriorityQueue';
 
 const drain = <T>(queue: PriorityQueue<T>): T[] => {
@@ -222,17 +226,17 @@ describe('PriorityQueue<TestEvent>', () => {
       {
         time: 30,
         seq: 0,
-        label: 'c', 
+        label: 'c',
       },
       {
         time: 10,
         seq: 1,
-        label: 'a', 
+        label: 'a',
       },
       {
         time: 20,
         seq: 2,
-        label: 'b', 
+        label: 'b',
       },
     ]);
 
@@ -246,27 +250,27 @@ describe('PriorityQueue<TestEvent>', () => {
       {
         time: 5,
         seq: 3,
-        label: 'd', 
+        label: 'd',
       },
       {
         time: 5,
         seq: 0,
-        label: 'a', 
+        label: 'a',
       },
       {
         time: 1,
         seq: 4,
-        label: 'first', 
+        label: 'first',
       },
       {
         time: 5,
         seq: 2,
-        label: 'c', 
+        label: 'c',
       },
       {
         time: 5,
         seq: 1,
-        label: 'b', 
+        label: 'b',
       },
     ]);
 
@@ -278,7 +282,7 @@ describe('PriorityQueue<TestEvent>', () => {
     const events = Array.from({ length: 100 }, (_, seq) => ({
       time: 7,
       seq,
-      label: `${seq}`, 
+      label: `${seq}`,
     }));
 
     pushAll(queue, [...events].reverse());
@@ -291,7 +295,7 @@ describe('PriorityQueue<TestEvent>', () => {
     const events = randomNumbers(500).map((time, seq) => ({
       time,
       seq,
-      label: `${seq}`, 
+      label: `${seq}`,
     }));
 
     pushAll(queue, events);
@@ -306,7 +310,7 @@ describe('PriorityQueue<TestEvent>', () => {
     const event = {
       time: 1,
       seq: 0,
-      label: 'a', 
+      label: 'a',
     };
 
     queue.push(event);
@@ -322,12 +326,12 @@ describe('PriorityQueue<TestEvent>', () => {
       {
         time: 10,
         seq: 0,
-        label: 'a', 
+        label: 'a',
       },
       {
         time: 20,
         seq: 1,
-        label: 'c', 
+        label: 'c',
       },
     ]);
 
@@ -336,7 +340,7 @@ describe('PriorityQueue<TestEvent>', () => {
     queue.push({
       time: 10,
       seq: 2,
-      label: 'b', 
+      label: 'b',
     });
 
     expect(head?.label).toBe('a');

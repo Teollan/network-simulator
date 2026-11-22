@@ -13,7 +13,10 @@ import {
   Send,
   type LucideIcon,
 } from 'lucide-react';
-import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 
 export interface EventDescription {
   icon: LucideIcon;

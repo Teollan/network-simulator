@@ -5,7 +5,10 @@ interface FieldErrorProps {
   error?: FormFieldError;
 }
 
-export const FieldError = ({ id, error }: FieldErrorProps) => {
+export const FieldError = ({
+  id,
+  error,
+}: FieldErrorProps) => {
   if (!error?.message) {
     return null;
   }

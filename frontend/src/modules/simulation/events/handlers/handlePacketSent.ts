@@ -1,4 +1,8 @@
-import { PACKET_DROP_REASON, SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  PACKET_DROP_REASON,
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 import type { Simulation } from '@/modules/simulation/Simulation';
 import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
@@ -10,11 +14,14 @@ export function handlePacketSent(
 ) {
   const { thisNode, from, packet } = event.data;
 
-  const destinations: StatefulNode[] = simulation.routing.route({
-    thisNode,
-    source: from,
-    destination: packet.destination,
-  });
+  const destinations: StatefulNode[] = simulation.routing.route(
+    {
+      thisNode,
+      source: from,
+      destination: packet.destination,
+    },
+    simulation,
+  );
 
   if (destinations.length === 0) {
     simulation.schedule({

@@ -2,7 +2,12 @@ import { ASIDE_TAB } from '@/components/editor/aside/aside.constants';
 import { NetworkTab } from '@/components/editor/aside/tabs/NetworkTab';
 import { SimulationTab } from '@/components/editor/aside/tabs/SimulationTab';
 import { TraceTab } from '@/components/editor/aside/tabs/TraceTab';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/Tabs';
 
 export const Aside = () => (
   <aside className="flex h-full flex-col bg-background">

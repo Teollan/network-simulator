@@ -1,18 +1,23 @@
 import { create } from 'zustand';
 import type { Network } from '@/modules/network/Network';
-import { DEFAULT_NETWORK_RECIPE } from '@/modules/network/network.constants';
-import { layoutNetwork, type LayoutPositions } from '@/modules/layout/layoutNetwork';
+import { DEFAULT_TOPOLOGY_SPEC } from '@/modules/network/network.constants';
+import {
+  layoutNetwork,
+  type LayoutPositions,
+} from '@/modules/layout/layoutNetwork';
 import { useTraceStore } from '@/stores/useTraceStore';
-import { makeNetwork } from '@/modules/network/builder/makeNetwork';
-import type { NetworkRecipe } from '@/modules/network/builder/NetworkRecipe';
+import { TopologyBuilder } from '@/modules/network/builder/TopologyBuilder';
+import type { TopologySpec } from '@/modules/network/builder/TopologySpec';
+import { getRandomSeed } from '@/modules/random/getRandomSeed';
 
 interface NetworkLayout {
   network: Network;
   positions: LayoutPositions;
+  seed: number;
 }
 
 interface NetworkStore {
-  networkRecipe: NetworkRecipe;
+  spec: TopologySpec;
   networkLayout: NetworkLayout | null;
   isGenerating: boolean;
 
@@ -20,14 +25,14 @@ interface NetworkStore {
 }
 
 export const useNetworkStore = create<NetworkStore>()((set, get) => ({
-  networkRecipe: DEFAULT_NETWORK_RECIPE,
+  spec: DEFAULT_TOPOLOGY_SPEC,
   networkLayout: null,
   isGenerating: false,
 
   generateNetwork: async () => {
     const {
       isGenerating,
-      networkRecipe,
+      spec,
     } = get();
 
     if (isGenerating) {
@@ -37,13 +42,15 @@ export const useNetworkStore = create<NetworkStore>()((set, get) => ({
     set({ isGenerating: true });
 
     try {
-      const network = makeNetwork(networkRecipe);
+      const seed = spec.seed ?? getRandomSeed();
+      const network = new TopologyBuilder(seed).build(spec);
       const positions = await layoutNetwork(network);
 
       set({
         networkLayout: {
           network,
           positions,
+          seed,
         },
         isGenerating: false,
       });

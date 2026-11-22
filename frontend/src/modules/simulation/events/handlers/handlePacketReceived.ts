@@ -1,4 +1,8 @@
-import { PACKET_DROP_REASON, SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  PACKET_DROP_REASON,
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 import type { Simulation } from '@/modules/simulation/Simulation';
 
 const PROPAGATION_DELAY = 0;
@@ -7,7 +11,9 @@ export function handlePacketReceived(
   event: SimulationEvent<typeof SIMULATION_EVENT_KIND.PACKET_RECEIVED>,
   simulation: Simulation,
 ) {
-  const { thisNode, from, packet } = event.data;
+  const {
+    thisNode, from, packet,
+  } = event.data;
 
   if (packet.destination === thisNode) {
     const message = thisNode.consumePacket(packet);

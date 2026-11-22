@@ -1,10 +1,21 @@
-import { getStraightPath, useInternalNode, type EdgeProps } from '@xyflow/react';
+import {
+  getStraightPath,
+  useInternalNode,
+  type EdgeProps,
+} from '@xyflow/react';
 import { getOutlineSegment } from '@/components/editor/canvas/edge/getOutlineSegment';
 import type { FloatingEdgeType } from '@/components/editor/canvas/edge/edge.types';
 
 const PACKET_RADIUS = 10; // px
 
-function FloatingEdge({ id, source, target, markerEnd, style, data }: EdgeProps<FloatingEdgeType>) {
+function FloatingEdge({
+  id,
+  source,
+  target,
+  markerEnd,
+  style,
+  data,
+}: EdgeProps<FloatingEdgeType>) {
   const sourceNode = useInternalNode(source);
   const targetNode = useInternalNode(target);
 

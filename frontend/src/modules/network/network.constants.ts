@@ -1,4 +1,7 @@
-import { NETWORK_BUILDER_ACTION as ACTION, type NetworkRecipe } from '@/modules/network/builder/NetworkRecipe';
+import {
+  TOPOLOGY_BUILDER_ACTION as ACTION,
+  type TopologySpec,
+} from '@/modules/network/builder/TopologySpec';
 
 export const DEFAULT_WEIGHT_POOL = [3, 5, 7, 8, 11, 12, 15, 18, 21, 25];
 export const DEFAULT_ROUTERS_PER_REGION = 9;
@@ -6,80 +9,110 @@ export const DEFAULT_CONNECTIVITY_DEGREE = 3.5;
 export const DEFAULT_WORKSTATION_INTERVAL = 3;
 export const DEFAULT_HALF_DUPLEX_SHARE = 0.25;
 
-export const DEFAULT_NETWORK_RECIPE: NetworkRecipe = {
+export const DEFAULT_TOPOLOGY_SPEC: TopologySpec = {
   actions: [
     {
-      kind: ACTION.SPAWN_REGION,
-      count: DEFAULT_ROUTERS_PER_REGION,
-      region: 'US',
+      kind: ACTION.CREATE_REGION,
+      options: {
+        label: 'US',
+        size: DEFAULT_ROUTERS_PER_REGION,
+      },
     },
     {
       kind: ACTION.LINK_INSIDE_REGION,
-      degree: DEFAULT_CONNECTIVITY_DEGREE,
-      region: 'US',
+      options: {
+        degree: DEFAULT_CONNECTIVITY_DEGREE,
+        region: 'US',
+      },
     },
     {
-      kind: ACTION.SPAWN_REGION,
-      count: DEFAULT_ROUTERS_PER_REGION,
-      region: 'DE',
-    },
-    {
-      kind: ACTION.LINK_INSIDE_REGION,
-      degree: DEFAULT_CONNECTIVITY_DEGREE,
-      region: 'DE',
-    },
-    {
-      kind: ACTION.SPAWN_REGION,
-      count: DEFAULT_ROUTERS_PER_REGION,
-      region: 'UA',
+      kind: ACTION.CREATE_REGION,
+      options: {
+        label: 'DE',
+        size: DEFAULT_ROUTERS_PER_REGION,
+      },
     },
     {
       kind: ACTION.LINK_INSIDE_REGION,
-      degree: DEFAULT_CONNECTIVITY_DEGREE,
-      region: 'UA',
+      options: {
+        degree: DEFAULT_CONNECTIVITY_DEGREE,
+        region: 'DE',
+      },
+    },
+    {
+      kind: ACTION.CREATE_REGION,
+      options: {
+        label: 'UA',
+        size: DEFAULT_ROUTERS_PER_REGION,
+      },
+    },
+    {
+      kind: ACTION.LINK_INSIDE_REGION,
+      options: {
+        degree: DEFAULT_CONNECTIVITY_DEGREE,
+        region: 'UA',
+      },
     },
     {
       kind: ACTION.LINK_REGIONS,
-      sourceRegion: 'US',
-      targetRegion: 'DE',
+      options: {
+        sourceRegion: 'US',
+        targetRegion: 'DE',
+      },
     },
     {
       kind: ACTION.LINK_REGIONS,
-      sourceRegion: 'DE',
-      targetRegion: 'UA',
+      options: {
+        sourceRegion: 'DE',
+        targetRegion: 'UA',
+      },
     },
     {
       kind: ACTION.LINK_REGIONS,
-      sourceRegion: 'UA',
-      targetRegion: 'US',
+      options: {
+        sourceRegion: 'UA',
+        targetRegion: 'US',
+      },
     },
     {
       kind: ACTION.ATTACH_WORKSTATIONS,
-      every: DEFAULT_WORKSTATION_INTERVAL,
-      region: 'US',
+      options: {
+        every: DEFAULT_WORKSTATION_INTERVAL,
+        region: 'US',
+      },
     },
     {
       kind: ACTION.ATTACH_WORKSTATIONS,
-      every: DEFAULT_WORKSTATION_INTERVAL,
-      region: 'DE',
+      options: {
+        every: DEFAULT_WORKSTATION_INTERVAL,
+        region: 'DE',
+      },
     },
     {
       kind: ACTION.ATTACH_WORKSTATIONS,
-      every: DEFAULT_WORKSTATION_INTERVAL,
-      region: 'UA',
+      options: {
+        every: DEFAULT_WORKSTATION_INTERVAL,
+        region: 'UA',
+      },
     },
     {
       kind: ACTION.ASSIGN_LINK_WEIGHTS,
-      pool: DEFAULT_WEIGHT_POOL,
+      options: {
+        pool: DEFAULT_WEIGHT_POOL,
+      },
     },
     {
       kind: ACTION.ASSIGN_LINK_TYPE,
-      halfDuplexShare: DEFAULT_HALF_DUPLEX_SHARE,
+      options: {
+        halfDuplexShare: DEFAULT_HALF_DUPLEX_SHARE,
+      },
     },
     // TODO: add proper default BERs
     {
       kind: ACTION.ASSIGN_BIT_ERROR_RATE,
-      value: 0,
+      options: {
+        value: 0,
+      },
     },
   ],
 };

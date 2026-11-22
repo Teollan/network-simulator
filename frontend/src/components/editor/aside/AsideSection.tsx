@@ -6,7 +6,11 @@ interface AsideSectionProps {
   children?: ReactNode;
 }
 
-export const AsideSection = ({ title, description, children }: AsideSectionProps) => (
+export const AsideSection = ({
+  title,
+  description,
+  children,
+}: AsideSectionProps) => (
   <section className="flex flex-col gap-3">
     <header className="flex flex-col gap-1">
       <h2 className="text-sm font-semibold">

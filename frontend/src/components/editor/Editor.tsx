@@ -2,7 +2,11 @@ import { Aside } from '@/components/editor/aside/Aside';
 import { Canvas } from '@/components/editor/canvas/Canvas';
 import { Timeline } from '@/components/editor/timeline/Timeline';
 import { Toolbar } from '@/components/editor/toolbar/Toolbar';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/Resizable';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/Resizable';
 
 export const Editor = () => (
   <ResizablePanelGroup

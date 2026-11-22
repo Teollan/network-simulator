@@ -1,4 +1,8 @@
-import type { InternalNode, Node, XYPosition } from '@xyflow/react';
+import type {
+  InternalNode,
+  Node,
+  XYPosition,
+} from '@xyflow/react';
 import { getNodeCenter } from '@/components/editor/canvas/edge/getNodeCenter';
 import { NODE_TYPE } from '@/components/editor/canvas/node/node.constants';
 

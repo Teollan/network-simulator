@@ -1,5 +1,8 @@
 import { LINK_TYPE } from '@/modules/network/Link';
-import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 import type { Simulation } from '@/modules/simulation/Simulation';
 import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 

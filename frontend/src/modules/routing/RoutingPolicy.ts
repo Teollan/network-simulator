@@ -1,3 +1,4 @@
+import type { Simulation } from '@/modules/simulation/Simulation';
 import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
 export interface RoutingOptions {
@@ -7,5 +8,5 @@ export interface RoutingOptions {
 }
 
 export interface RoutingPolicy {
-  route(options: RoutingOptions): StatefulNode[];
+  route(options: RoutingOptions, simulation: Simulation): StatefulNode[];
 }

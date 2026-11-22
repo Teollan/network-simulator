@@ -1,6 +1,13 @@
-import { useEffect, type Dispatch, type SetStateAction } from 'react';
+import {
+  useEffect,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import type { Edge } from '@xyflow/react';
-import type { EdgePacket, FloatingEdgeData } from '@/components/editor/canvas/edge/edge.types';
+import type {
+  EdgePacket,
+  FloatingEdgeData,
+} from '@/components/editor/canvas/edge/edge.types';
 import { usePlaybackClockStore } from '@/stores/usePlaybackClockStore';
 import { usePlaybackStore } from '@/stores/usePlaybackStore';
 

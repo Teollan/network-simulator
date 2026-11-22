@@ -2,7 +2,7 @@ Course project variant 6 checklist:
 
 Model:
 []: TypeScript simulation core, shared by the web UI (runs in a Web Worker) and the Node CLI
-[]: own seeded PRNG + sampling (no Math.random) for deterministic runs
+[]: seeded PRNG with independent streams per purpose (topology, traffic, errors, routing), no Math.random; reproducible within one code version only (records keep generated model + traffic, not just the seed)
 []: model/scenario types defined once, shared by core, UI and JSON validation
 [x]: Types of nodes: router, workstation
 [x]: workstations attached to every k-th router, k in {2, 3, 4}; workstations are the message endpoints

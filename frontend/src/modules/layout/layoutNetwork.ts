@@ -20,8 +20,10 @@ export const layoutNetwork = async (network: Network): Promise<LayoutPositions> 
 
   const { children = [] } = await elk.layout(graph);
 
-  return new Map(children.map(({ id, x = 0, y = 0 }) => [Number(id), {
-    x,
-    y,
-  }]));
+  return new Map(children.map(
+    ({ id, x = 0, y = 0 }) => [Number(id), {
+      x,
+      y,
+    }]),
+  );
 };

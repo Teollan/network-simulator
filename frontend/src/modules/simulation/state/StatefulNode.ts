@@ -1,9 +1,15 @@
 import type { Node } from '@/modules/network/node/Node';
-import type { BufferSize, NodeType } from '@/modules/network/node/Node.typedefs';
+import type {
+  BufferSize,
+  NodeType,
+} from '@/modules/network/node/Node.typedefs';
 import type { StatefulLink } from '@/modules/simulation/state/StatefulLink';
 import type { Frame } from '@/modules/traffic/Frame';
 import type { Message } from '@/modules/traffic/Message';
-import { byOffset, type Packet } from '@/modules/traffic/Packet';
+import {
+  byOffset,
+  type Packet,
+} from '@/modules/traffic/Packet';
 import { Queue } from '@/modules/util/Queue';
 
 interface DataByDestination {

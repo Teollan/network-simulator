@@ -1,5 +1,10 @@
 import { memo } from 'react';
-import { type NodeProps, type Node, Handle, Position } from '@xyflow/react';
+import {
+  type NodeProps,
+  type Node,
+  Handle,
+  Position,
+} from '@xyflow/react';
 import { cn } from 'cn';
 import { NODE_SIZE } from '@/components/editor/canvas/node/node.constants';
 
@@ -24,7 +29,7 @@ export const RouterNode = memo(({ data, selected }: RouterNodeProps) => {
         )}
         style={{
           width: NODE_SIZE,
-          height: NODE_SIZE, 
+          height: NODE_SIZE,
         }}
       >
         {data.label}

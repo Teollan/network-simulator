@@ -1,4 +1,7 @@
-import type { Node as FlowNode, XYPosition } from '@xyflow/react';
+import type {
+  Node as FlowNode,
+  XYPosition,
+} from '@xyflow/react';
 import { NODE_TYPE as FLOW_NODE_TYPE } from '@/components/editor/canvas/node/node.constants';
 import type { Node } from '@/modules/network/node/Node';
 import { NODE_TYPE } from '@/modules/network/node/Node.constants';

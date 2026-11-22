@@ -1,4 +1,8 @@
-import { isEventOfKind, SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  isEventOfKind,
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 import type { Frame } from '@/modules/traffic/Frame';
 import { notNull } from '@/modules/util/functional';
 

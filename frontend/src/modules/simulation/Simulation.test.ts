@@ -1,10 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import { Network } from '@/modules/network/Network';
-import { LINK_TYPE, type LinkType } from '@/modules/network/Link';
+import {
+  LINK_TYPE,
+  type LinkType,
+} from '@/modules/network/Link';
 import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import type { RoutingPolicy } from '@/modules/routing/RoutingPolicy';
 import { Simulation } from '@/modules/simulation/Simulation';
-import { PACKET_DROP_REASON, SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  PACKET_DROP_REASON,
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 import type { PacketFactoryConfig } from '@/modules/traffic/PacketFactory';
 
 const MESSAGE_SIZE = 30;
@@ -13,6 +24,8 @@ const PACKETS: PacketFactoryConfig = {
   maxSize: 10,
   maxHops: 10,
 };
+
+const SEED = 1;
 
 const PACKETS_PER_MESSAGE = Math.ceil(MESSAGE_SIZE / PACKETS.maxSize);
 
@@ -50,6 +63,7 @@ const runExchange = (linkType: LinkType) => {
   ]);
 
   const simulation = new Simulation({
+    seed: SEED,
     network,
     routingPolicy: directRouting,
     packets: PACKETS,
@@ -241,6 +255,7 @@ describe('Simulation: buffer overflow', () => {
     ]);
 
     const simulation = new Simulation({
+      seed: SEED,
       network,
       routingPolicy: directRouting,
       packets: PACKETS,
@@ -343,6 +358,7 @@ describe('Simulation: hop limit', () => {
     ]);
 
     const simulation = new Simulation({
+      seed: SEED,
       network,
       routingPolicy: chainRouting,
       packets: {

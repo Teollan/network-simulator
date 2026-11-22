@@ -5,7 +5,12 @@ import { createRoutingPolicy } from '@/modules/routing/createRoutingPolicy';
 import { ROUTING_POLICY } from '@/modules/routing/routing.constants';
 import { Simulation } from '@/modules/simulation/Simulation';
 import type { SimulationConfig } from '@/modules/simulation/simulationConfig.schema';
-import { DEFAULT_MAX_HOPS, DEFAULT_MAX_PACKET_SIZE, DEFAULT_RUN_UNTIL } from '@/modules/simulation/simulation.constants';
+import {
+  DEFAULT_MAX_HOPS,
+  DEFAULT_MAX_PACKET_SIZE,
+  DEFAULT_RUN_UNTIL,
+} from '@/modules/simulation/simulation.constants';
+import { getRandomSeed } from '@/modules/random/getRandomSeed';
 import { summarizeTrace } from '@/modules/simulation/summarizeTrace';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { useTraceStore } from '@/stores/useTraceStore';
@@ -43,7 +48,13 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
     }
 
     const { network } = networkLayout;
-    const { routingPolicyId, runUntil, maxPacketSize, maxHops } = get().simulationConfig;
+    const {
+      seed = getRandomSeed(),
+      routingPolicyId,
+      runUntil,
+      maxPacketSize,
+      maxHops,
+    } = get().simulationConfig;
     const workstations = network.getNodes({ type: NODE_TYPE.WORKSTATION });
     const source = workstations.at(0);
     const destination = workstations.at(-1);
@@ -53,6 +64,7 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
     }
 
     const simulation = new Simulation({
+      seed,
       network,
       routingPolicy: createRoutingPolicy(routingPolicyId),
       packets: {
@@ -79,7 +91,7 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
       useTraceStore.getState().setEvents(simulation.trace);
 
       toast.error(`Simulation failed at t = ${simulation.time.toFixed(2)}`, {
-        description: error instanceof Error ? error.message : String(error),
+        description: `seed ${seed} · ${error instanceof Error ? error.message : String(error)}`,
       });
 
       return;
@@ -87,8 +99,12 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
 
     useTraceStore.getState().setEvents(simulation.trace);
 
-    const { eventCount, deliveredCount, droppedCount } = summarizeTrace(simulation.trace);
-    const description = `${eventCount} events · ${deliveredCount} delivered · ${droppedCount} dropped`;
+    const {
+      eventCount,
+      deliveredCount,
+      droppedCount,
+    } = summarizeTrace(simulation.trace);
+    const description = `seed ${seed} · ${eventCount} events · ${deliveredCount} delivered · ${droppedCount} dropped`;
     const time = simulation.time.toFixed(2);
 
     if (simulation.pendingEventCount > 0) {

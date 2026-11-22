@@ -1,4 +1,7 @@
-import { SIMULATION_EVENT_KIND, type SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import {
+  SIMULATION_EVENT_KIND,
+  type SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 import type { Simulation } from '@/modules/simulation/Simulation';
 
 const FRAME_TO_PACKET_DELAY = 0;

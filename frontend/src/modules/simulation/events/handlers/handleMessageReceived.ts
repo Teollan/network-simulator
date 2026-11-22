@@ -1,4 +1,7 @@
-import type { SIMULATION_EVENT_KIND, SimulationEvent } from '@/modules/simulation/events/SimulationEvent';
+import type {
+  SIMULATION_EVENT_KIND,
+  SimulationEvent,
+} from '@/modules/simulation/events/SimulationEvent';
 import type { Simulation } from '@/modules/simulation/Simulation';
 
 export function handleMessageReceived(

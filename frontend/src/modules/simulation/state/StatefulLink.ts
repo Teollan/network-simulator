@@ -1,4 +1,9 @@
-import { LINK_TYPE, type Link, type LinkMedium, type LinkType } from '@/modules/network/Link';
+import {
+  LINK_TYPE,
+  type Link,
+  type LinkMedium,
+  type LinkType,
+} from '@/modules/network/Link';
 import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
 
 export type IsBusy = boolean | {

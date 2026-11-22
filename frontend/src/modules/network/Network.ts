@@ -1,9 +1,25 @@
 import type { Node } from '@/modules/network/node/Node';
 import { DEFAULT_NODE_FIELDS } from '@/modules/network/node/Node.constants';
-import type { CreateNodeFields, NodeFilters, UpdateNodeFields } from '@/modules/network/node/Node.typedefs';
-import { DEFAULT_LINK_FIELDS, type CreateLinkFields, type Link, type LinkFilters, type UpdateLinkFields } from '@/modules/network/Link';
-import { getLinkComplement, isLinkWith } from '@/modules/network/network.helpers';
-import type { CreateRegionFields, Region } from '@/modules/network/Region';
+import type {
+  CreateNodeFields,
+  NodeFilters,
+  UpdateNodeFields,
+} from '@/modules/network/node/Node.typedefs';
+import {
+  DEFAULT_LINK_FIELDS,
+  type CreateLinkFields,
+  type Link,
+  type LinkFilters,
+  type UpdateLinkFields,
+} from '@/modules/network/Link';
+import {
+  getLinkComplement,
+  isLinkWith,
+} from '@/modules/network/network.helpers';
+import type {
+  CreateRegionFields,
+  Region,
+} from '@/modules/network/Region';
 import { Serial } from '@/modules/util/Serial';
 
 export class Network {
@@ -16,7 +32,7 @@ export class Network {
   private linksSerial = new Serial();
   private links: Link[] = [];
 
-  // === REGION === 
+  // === REGION ===
   findRegion(regionId: number): Region | null {
     return this.regions.find(
       (region) => region.id === regionId,
@@ -66,7 +82,7 @@ export class Network {
     return created;
   }
 
-  // === NODE === 
+  // === NODE ===
   getNodes(filters: NodeFilters = {}): Node[] {
     const { nodes } = this;
 
@@ -129,7 +145,7 @@ export class Network {
     }
   }
 
-  // === LINK === 
+  // === LINK ===
   findLinkBetween(a: number, b: number): Link | null {
     const { links } = this;
 

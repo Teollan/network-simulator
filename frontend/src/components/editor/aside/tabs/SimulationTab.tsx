@@ -1,24 +1,50 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Zap } from 'lucide-react';
-import { Controller, useForm } from 'react-hook-form';
+import {
+  Controller,
+  useForm,
+} from 'react-hook-form';
 import { AsideSection } from '@/components/editor/aside/AsideSection';
 import { FieldError } from '@/components/editor/aside/FieldError';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { ROUTING_POLICY, ROUTING_POLICY_LABEL, type RoutingPolicyId } from '@/modules/routing/routing.constants';
-import { simulationConfigSchema, type SimulationConfig } from '@/modules/simulation/simulationConfig.schema';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
+import {
+  ROUTING_POLICY,
+  ROUTING_POLICY_LABEL,
+  type RoutingPolicyId,
+} from '@/modules/routing/routing.constants';
+import {
+  simulationConfigSchema,
+  type SimulationConfig,
+} from '@/modules/simulation/simulationConfig.schema';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { useSimulationStore } from '@/stores/useSimulationStore';
 
 const ROUTING_POLICY_IDS = Object.values(ROUTING_POLICY) as RoutingPolicyId[];
 
 export const SimulationTab = () => {
-  const { simulationConfig, setSimulationConfig, runSimulation } = useSimulationStore();
+  const {
+    simulationConfig,
+    setSimulationConfig,
+    runSimulation,
+  } = useSimulationStore();
+
   const { networkLayout } = useNetworkStore();
 
-  const { control, register, handleSubmit, formState: { errors } } = useForm<SimulationConfig>({
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SimulationConfig>({
     resolver: zodResolver(simulationConfigSchema),
     defaultValues: simulationConfig,
     mode: 'onChange',

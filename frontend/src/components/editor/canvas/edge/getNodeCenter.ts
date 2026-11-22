@@ -1,4 +1,8 @@
-import type { InternalNode, Node, XYPosition } from '@xyflow/react';
+import type {
+  InternalNode,
+  Node,
+  XYPosition,
+} from '@xyflow/react';
 
 export const getNodeCenter = (node: InternalNode<Node>): XYPosition => {
   const { x, y } = node.internals.positionAbsolute;

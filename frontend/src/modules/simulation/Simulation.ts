@@ -21,8 +21,12 @@ import { handleLinkAcquired } from '@/modules/simulation/events/handlers/handleL
 import { handleLinkReleased } from '@/modules/simulation/events/handlers/handleLinkReleased';
 import { Serial } from '@/modules/util/Serial';
 import type { SimulationEventHandler } from '@/modules/simulation/events/handlers/handlers.typedef';
-import { PacketFactory, type PacketFactoryConfig } from '@/modules/traffic/PacketFactory';
+import {
+  PacketFactory,
+  type PacketFactoryConfig,
+} from '@/modules/traffic/PacketFactory';
 import type { Message } from '@/modules/traffic/Message';
+import { Random } from 'random';
 
 interface TrafficDTO {
   message: Message;
@@ -32,6 +36,7 @@ interface TrafficDTO {
 }
 
 export interface SimulationConfig {
+  seed: number;
   network: Network;
   packets: PacketFactoryConfig;
   routingPolicy: RoutingPolicy;
@@ -48,6 +53,7 @@ export class Simulation {
   readonly network: StatefulNetwork;
   readonly routing: RoutingPolicy;
   readonly packets: PacketFactory;
+  readonly random: Random;
 
   private handlersByEventKind: { [K in SimulationEventKind]: SimulationEventHandler<K>[] } = {
     [SIMULATION_EVENT_KIND.MESSAGE_SENT]: [handleMessageSent],
@@ -66,6 +72,7 @@ export class Simulation {
   };
 
   constructor(config: SimulationConfig) {
+    this.random = new Random(config.seed);
     this.network = new StatefulNetwork(config.network);
     this.routing = config.routingPolicy;
 

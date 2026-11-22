@@ -1,4 +1,7 @@
-import type { BufferSize, NodeType } from '@/modules/network/node/Node.typedefs';
+import type {
+  BufferSize,
+  NodeType,
+} from '@/modules/network/node/Node.typedefs';
 
 export interface Node {
   id: number;
