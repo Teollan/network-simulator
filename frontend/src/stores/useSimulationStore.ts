@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import { toast } from 'sonner';
 import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import { createRoutingPolicy } from '@/modules/routing/createRoutingPolicy';
-import { ROUTING_POLICY, type RoutingPolicyId } from '@/modules/routing/routing.constants';
+import { ROUTING_POLICY } from '@/modules/routing/routing.constants';
 import { Simulation } from '@/modules/simulation/Simulation';
+import type { SimulationConfig } from '@/modules/simulation/simulationConfig.schema';
 import { DEFAULT_MAX_HOPS, DEFAULT_MAX_PACKET_SIZE, DEFAULT_RUN_UNTIL } from '@/modules/simulation/simulation.constants';
 import { summarizeTrace } from '@/modules/simulation/summarizeTrace';
 import { useNetworkStore } from '@/stores/useNetworkStore';
@@ -11,13 +12,6 @@ import { useTraceStore } from '@/stores/useTraceStore';
 
 // TODO: replace with configurable traffic
 const PLACEHOLDER_MESSAGE_LENGTH = 30;
-
-export interface SimulationConfig {
-  routingPolicyId: RoutingPolicyId;
-  runUntil: number;
-  maxPacketSize: number;
-  maxHops: number;
-}
 
 interface SimulationStore {
   simulationConfig: SimulationConfig;

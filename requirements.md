@@ -19,7 +19,7 @@ Model:
 [x]: messages can be of varying length
 [x]: buffers are per router interface (output queue per outgoing line, needed for a*queue_len); size configurable per interface, so the two ends of a link can differ
 [x]: buffer size generation policy: constant from set
-[]: buffer overflow: packet dropped, counted as lost
+[x]: buffer overflow: packet dropped, counted as lost
 
 Topology generator:
 []: random generation with configurable policies (weights, buffers, half-duplex share, p_bit)
@@ -46,7 +46,7 @@ Transmission modes:
 []: VC setup request is routed by the local adaptive rule (see Routing); the path it takes is then fixed for the circuit
 []: VC broken by disabled node/link: circuit torn down, source re-runs setup (re-setup counted as control traffic)
 [x]: datagram: each packet routed independently, may arrive out of order
-[]: message fragmentation into packets of configurable size (packet size independent of message size)
+[x]: message fragmentation into packets of configurable size (packet size independent of message size)
 [x]: reassembly at destination (incl. out-of-order arrival in datagram mode)
 
 Routing (local adaptive, as defined in lecture 12, slide 23: the node chooses routes on its own, without information from other nodes; route tables are loaded centrally in advance; a packet goes along the shortest path, taking the shortest output queue into account):
