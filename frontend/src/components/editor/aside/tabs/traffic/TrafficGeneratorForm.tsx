@@ -10,7 +10,7 @@ import {
   useWatch,
 } from 'react-hook-form';
 import { z } from 'zod';
-import { FieldError } from '@/components/editor/aside/FieldError';
+import { FieldError } from '@/components/ui/form/FieldError';
 import { NumberField } from '@/components/ui/form/NumberField';
 import {
   DEFAULT_MESSAGE_SIZE,

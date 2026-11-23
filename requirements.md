@@ -65,7 +65,7 @@ Simulation:
 [x]: Discrete Event Simulation DES 
 [x]: simulate communication between nodes
 []: simulate routing with local adaptive routing (static shortest-path tables + output queue length, see Routing section)
-[]: traffic: random traffic generator: arrival process (e.g. Poisson with rate lambda), message size distribution, src/dst selection (e.g. uniform over workstation pairs)
+[x]: traffic: random traffic generator: arrival process (e.g. Poisson with rate lambda), message size distribution, src/dst selection (e.g. uniform over workstation pairs)
 []: traffic: manual "send N bytes from workstation A to B" (UI + scenario events)
 []: enable/disable nodes and links at runtime (UI or scheduled scenario events); disabled element drops its buffered packets (counted as lost)
 []: produces a simulation record that can be deterministically replayed/rerun
@@ -102,7 +102,7 @@ Visualization:
 [x]: Web app (React.js)
 [x]: Visible connections between nodes with indications of packets traveling through them
 []: Connection heatmap: green-to-red gradient by link utilisation / queue fill
-[]: Ability to setup, run the simulation and see the result
+[x]: Ability to setup, run the simulation and see the result
 []: mouse editing: add, delete, select, drag nodes and links
 []: hover/select info: route table, link weight, buffer load
 []: route tables view for every node (by weight and by hops)

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { AsideSection } from '@/components/editor/aside/AsideSection';
-import { FieldError } from '@/components/editor/aside/FieldError';
+import { FieldError } from '@/components/ui/form/FieldError';
 import { toOptionalNumber } from '@/components/editor/aside/toOptionalNumber';
 import { keyOf } from '@/components/editor/aside/tabs/topology/keyOf';
 import { TopologyRuleCard } from '@/components/editor/aside/tabs/topology/TopologyRuleCard';

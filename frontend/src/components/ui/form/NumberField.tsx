@@ -2,7 +2,7 @@ import type {
   FieldError as FormFieldError,
   UseFormRegisterReturn,
 } from 'react-hook-form';
-import { FieldError } from '@/components/editor/aside/FieldError';
+import { FieldError } from '@/components/ui/form/FieldError';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 

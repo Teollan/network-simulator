@@ -5,7 +5,7 @@ import {
   useForm,
 } from 'react-hook-form';
 import { AsideSection } from '@/components/editor/aside/AsideSection';
-import { FieldError } from '@/components/editor/aside/FieldError';
+import { FieldError } from '@/components/ui/form/FieldError';
 import { toOptionalNumber } from '@/components/editor/aside/toOptionalNumber';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
