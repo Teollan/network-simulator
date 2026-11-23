@@ -2,7 +2,7 @@ Course project variant 6 checklist:
 
 Model:
 []: TypeScript simulation core, shared by the web UI (runs in a Web Worker) and the Node CLI
-[]: seeded PRNG with independent streams per purpose (topology, traffic, errors, routing), no Math.random; reproducible within one code version only (records keep generated model + traffic, not just the seed)
+[x]: seeded PRNG with independent streams per purpose (topology, traffic, errors, routing), no Math.random; reproducible within one code version only (records keep generated model + traffic, not just the seed)
 []: model/scenario types defined once, shared by core, UI and JSON validation
 [x]: Types of nodes: router, workstation
 [x]: workstations attached to every k-th router, k in {2, 3, 4}; workstations are the message endpoints
@@ -15,14 +15,14 @@ Model:
 []: weight = routing cost only (input for Dijkstra etc.); timing comes from separate per-link params (bandwidth, propagation delay)
 []: weight must be monotonic with latency for a reference packet size: smaller weight => smaller latency (generator must keep this, e.g. satellite links get weights from the high end of the set)
 [x]: per-link attributes: type (ground/satellite), duplex | half-duplex, weight, p_bit (per-bit error probability)
-[]: weight generation policy: random in range | constant from set
+[x]: weight generation policy: constant from set
 [x]: messages can be of varying length
 [x]: buffers are per router interface (output queue per outgoing line, needed for a*queue_len); size configurable per interface, so the two ends of a link can differ
 [x]: buffer size generation policy: constant from set
 [x]: buffer overflow: packet dropped, counted as lost
 
 Topology generator:
-[]: random generation with configurable policies (weights, buffers, half-duplex share, p_bit)
+[x]: random generation with configurable policies (weights, buffers, half-duplex share, p_bit)
 [x]: variant 6 preset: 3 regional networks x >= 9 routers, average degree 3.5
 [x]: weights from set {3, 5, 7, 8, 11, 12, 15, 18, 21, 25}
 [x]: links between regional networks are satellite links

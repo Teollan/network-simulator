@@ -3,13 +3,22 @@ import { TraceEventList } from '@/components/editor/aside/tabs/trace/TraceEventL
 import { useTraceStore } from '@/stores/useTraceStore';
 
 export const TraceTab = () => {
-  const { events } = useTraceStore();
+  const {
+    events,
+    seed,
+  } = useTraceStore();
 
   return (
     <AsideSection
       title="Trace"
       description="Events recorded during the last run."
     >
+      {seed !== null && (
+        <p className="text-xs text-muted-foreground">
+          {`seed ${seed}`}
+        </p>
+      )}
+
       <TraceEventList events={events} />
     </AsideSection>
   );

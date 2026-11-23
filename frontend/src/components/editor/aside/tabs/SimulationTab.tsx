@@ -6,6 +6,7 @@ import {
 } from 'react-hook-form';
 import { AsideSection } from '@/components/editor/aside/AsideSection';
 import { FieldError } from '@/components/editor/aside/FieldError';
+import { toOptionalNumber } from '@/components/editor/aside/toOptionalNumber';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -65,6 +66,28 @@ export const SimulationTab = () => {
         noValidate
         onSubmit={handleSubmit(onSubmit)}
       >
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="simulation-seed">
+            Seed
+          </Label>
+
+          <Input
+            id="simulation-seed"
+            type="number"
+            min={0}
+            step={1}
+            placeholder="Random"
+            aria-invalid={!!errors.seed}
+            aria-describedby="simulation-seed-error"
+            {...register('seed', { setValueAs: toOptionalNumber })}
+          />
+
+          <FieldError
+            id="simulation-seed-error"
+            error={errors.seed}
+          />
+        </div>
+
         <div className="flex flex-col gap-2">
           <Label htmlFor="routing-policy">
             Routing policy

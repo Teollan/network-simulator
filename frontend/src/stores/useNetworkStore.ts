@@ -21,6 +21,7 @@ interface NetworkStore {
   networkLayout: NetworkLayout | null;
   isGenerating: boolean;
 
+  setSpec: (spec: Partial<TopologySpec>) => void;
   generateNetwork: () => Promise<void>;
 }
 
@@ -28,6 +29,13 @@ export const useNetworkStore = create<NetworkStore>()((set, get) => ({
   spec: DEFAULT_TOPOLOGY_SPEC,
   networkLayout: null,
   isGenerating: false,
+
+  setSpec: (spec) => set((state) => ({
+    spec: {
+      ...state.spec,
+      ...spec,
+    },
+  })),
 
   generateNetwork: async () => {
     const {
