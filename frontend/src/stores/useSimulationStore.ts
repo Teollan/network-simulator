@@ -15,9 +15,6 @@ import { summarizeTrace } from '@/modules/simulation/summarizeTrace';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { useTraceStore } from '@/stores/useTraceStore';
 
-// TODO: replace with configurable traffic
-const PLACEHOLDER_MESSAGE_LENGTH = 30;
-
 interface SimulationStore {
   simulationConfig: SimulationConfig;
 
@@ -66,20 +63,22 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
     const simulation = new Simulation({
       seed,
       network,
-      routingPolicy: createRoutingPolicy(routingPolicyId),
+      routing: createRoutingPolicy(routingPolicyId),
       packets: {
         maxSize: maxPacketSize,
         maxHops,
       },
-      traffic: [{
-        message: {
-          id: 1,
-          size: PLACEHOLDER_MESSAGE_LENGTH,
-        },
-        sourceId: source.id,
-        destinationId: destination.id,
-        time: 0,
-      }],
+      traffic: {
+        generators: [{
+          kind: 'scripted',
+          sourceId: source.id,
+          transmissions: [{
+            time: 0,
+            destinationId: destination.id,
+            size: 30,
+          }],
+        }],
+      },
     });
 
     try {

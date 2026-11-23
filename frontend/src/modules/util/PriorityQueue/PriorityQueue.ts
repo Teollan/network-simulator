@@ -62,6 +62,10 @@ export class PriorityQueue<T> {
     return this.heap.at(0) ?? null;
   }
 
+  public toArray(): T[] {
+    return [...this.heap];
+  }
+
   public get length() {
     return this.heap.length;
   }

@@ -17,6 +17,7 @@ import {
   type SimulationEvent,
 } from '@/modules/simulation/events/SimulationEvent';
 import type { PacketFactoryConfig } from '@/modules/traffic/PacketFactory';
+import type { TrafficGeneratorConfig } from '@/modules/traffic/generator/generator.typedefs';
 
 const MESSAGE_SIZE = 30;
 
@@ -28,6 +29,17 @@ const PACKETS: PacketFactoryConfig = {
 const SEED = 1;
 
 const PACKETS_PER_MESSAGE = Math.ceil(MESSAGE_SIZE / PACKETS.maxSize);
+
+// a single message at t = 0, from source to destination
+const oneMessage = (sourceId: number, destinationId: number): TrafficGeneratorConfig => ({
+  kind: 'scripted',
+  sourceId,
+  transmissions: [{
+    time: 0,
+    destinationId,
+    size: MESSAGE_SIZE,
+  }],
+});
 
 // deterministic stub, so routing randomness can't leak into simulation tests:
 // forward straight to the destination if it is adjacent, otherwise give up
@@ -65,28 +77,14 @@ const runExchange = (linkType: LinkType) => {
   const simulation = new Simulation({
     seed: SEED,
     network,
-    routingPolicy: directRouting,
+    routing: directRouting,
     packets: PACKETS,
-    traffic: [
-      {
-        message: {
-          id: 1,
-          size: MESSAGE_SIZE,
-        },
-        sourceId: a.id,
-        destinationId: b.id,
-        time: 0,
-      },
-      {
-        message: {
-          id: 2,
-          size: MESSAGE_SIZE,
-        },
-        sourceId: b.id,
-        destinationId: a.id,
-        time: 0,
-      },
-    ],
+    traffic: {
+      generators: [
+        oneMessage(a.id, b.id),
+        oneMessage(b.id, a.id),
+      ],
+    },
   });
 
   simulation.run();
@@ -94,7 +92,7 @@ const runExchange = (linkType: LinkType) => {
   return simulation;
 };
 
-const ofKind = <K extends SimulationEvent['kind']>(trace: SimulationEvent[], kind: K) => (
+const ofKind = <K extends SimulationEvent['kind']>(trace: readonly SimulationEvent[], kind: K) => (
   trace.filter((event): event is Extract<SimulationEvent, { kind: K }> => event.kind === kind)
 );
 
@@ -257,19 +255,13 @@ describe('Simulation: buffer overflow', () => {
     const simulation = new Simulation({
       seed: SEED,
       network,
-      routingPolicy: directRouting,
+      routing: directRouting,
       packets: PACKETS,
-      traffic: [
-        {
-          message: {
-            id: 1,
-            size: MESSAGE_SIZE,
-          },
-          sourceId: a.id,
-          destinationId: b.id,
-          time: 0,
-        },
-      ],
+      traffic: {
+        generators: [
+          oneMessage(a.id, b.id),
+        ],
+      },
     });
 
     simulation.run();
@@ -360,22 +352,16 @@ describe('Simulation: hop limit', () => {
     const simulation = new Simulation({
       seed: SEED,
       network,
-      routingPolicy: chainRouting,
+      routing: chainRouting,
       packets: {
         ...PACKETS,
         maxHops,
       },
-      traffic: [
-        {
-          message: {
-            id: 1,
-            size: MESSAGE_SIZE,
-          },
-          sourceId: a.id,
-          destinationId: c.id,
-          time: 0,
-        },
-      ],
+      traffic: {
+        generators: [
+          oneMessage(a.id, c.id),
+        ],
+      },
     });
 
     simulation.run();
@@ -412,5 +398,196 @@ describe('Simulation: hop limit', () => {
 
     expect(ofKind(trace, SIMULATION_EVENT_KIND.PACKET_DROPPED)).toHaveLength(0);
     expect(ofKind(trace, SIMULATION_EVENT_KIND.MESSAGE_RECEIVED).map(({ data }) => data.thisNode.label)).toEqual(['C']);
+  });
+});
+
+describe('Simulation: periodic traffic', () => {
+  const PERIOD = 5;
+  const RUN_UNTIL = 12;
+
+  // A sends to B every PERIOD from t = 0, so the run sees sends at 0, 5 and 10
+  const runPeriodic = () => {
+    const network = new Network();
+    const region = network.createRegion({ label: 'R' });
+
+    const [a, b] = network.createManyNodes([
+      {
+        label: 'A',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+      {
+        label: 'B',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+    ]);
+
+    network.createManyLinks([
+      {
+        sourceId: a.id,
+        targetId: b.id,
+      },
+    ]);
+
+    const simulation = new Simulation({
+      seed: SEED,
+      network,
+      routing: directRouting,
+      packets: PACKETS,
+      traffic: {
+        generators: [{
+          kind: 'periodic',
+          sourceId: a.id,
+          period: PERIOD,
+          phase: 0,
+          destination: {
+            kind: 'constant',
+            destinationId: b.id,
+          },
+          size: {
+            kind: 'constant',
+            size: MESSAGE_SIZE,
+          },
+        }],
+      },
+    });
+
+    simulation.run(RUN_UNTIL);
+
+    return simulation;
+  };
+
+  it('should send a message every period up to the run limit', () => {
+    const sent = ofKind(runPeriodic().trace, SIMULATION_EVENT_KIND.MESSAGE_SENT);
+
+    expect(sent.map(({ time }) => time)).toEqual([0, 5, 10]);
+  });
+
+  it('should give every generated message a fresh id', () => {
+    const sent = ofKind(runPeriodic().trace, SIMULATION_EVENT_KIND.MESSAGE_SENT);
+
+    expect(sent.map(({ data }) => data.message.id)).toEqual([1, 2, 3]);
+  });
+
+  it('should send every message from the generator source to its destination', () => {
+    const sent = ofKind(runPeriodic().trace, SIMULATION_EVENT_KIND.MESSAGE_SENT);
+
+    for (const { data } of sent) {
+      expect(data.source.label).toBe('A');
+      expect(data.destination.label).toBe('B');
+      expect(data.message.size).toBe(MESSAGE_SIZE);
+    }
+  });
+
+  it('should keep exactly one send pending past the run limit', () => {
+    const pendingSends = ofKind(runPeriodic().pendingEvents, SIMULATION_EVENT_KIND.MESSAGE_SENT);
+
+    expect(pendingSends.map(({ time }) => time)).toEqual([15]);
+  });
+});
+
+describe('Simulation: poisson traffic', () => {
+  const RATE = 0.05;
+  const RUN_UNTIL = 20_000;
+  // ~1000 arrivals: the sample mean is within ~3 standard errors of the expected one
+  const TOLERANCE = 0.1;
+
+  // A sends to B or C, picked uniformly, at Poisson arrivals with RATE
+  const runPoisson = (seed = SEED) => {
+    const network = new Network();
+    const region = network.createRegion({ label: 'R' });
+
+    const [a, b, c] = network.createManyNodes([
+      {
+        label: 'A',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+      {
+        label: 'B',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+      {
+        label: 'C',
+        regionId: region.id,
+        type: NODE_TYPE.WORKSTATION,
+      },
+    ]);
+
+    network.createManyLinks([
+      {
+        sourceId: a.id,
+        targetId: b.id,
+      },
+      {
+        sourceId: a.id,
+        targetId: c.id,
+      },
+    ]);
+
+    const simulation = new Simulation({
+      seed,
+      network,
+      routing: directRouting,
+      packets: PACKETS,
+      traffic: {
+        generators: [{
+          kind: 'poisson',
+          sourceId: a.id,
+          rate: RATE,
+          destination: { kind: 'uniform' },
+          size: {
+            kind: 'constant',
+            size: MESSAGE_SIZE,
+          },
+        }],
+      },
+    });
+
+    simulation.run(RUN_UNTIL);
+
+    return simulation;
+  };
+
+  const sendTimes = (simulation: Simulation) => (
+    ofKind(simulation.trace, SIMULATION_EVENT_KIND.MESSAGE_SENT).map(({ time }) => time)
+  );
+
+  it('should produce the same arrivals for the same seed', () => {
+    expect(sendTimes(runPoisson())).toEqual(sendTimes(runPoisson()));
+  });
+
+  it('should produce different arrivals for a different seed', () => {
+    expect(sendTimes(runPoisson(SEED + 1))).not.toEqual(sendTimes(runPoisson()));
+  });
+
+  it('should send the first message after t = 0', () => {
+    expect(sendTimes(runPoisson())[0]).toBeGreaterThan(0);
+  });
+
+  it('should send about RATE * RUN_UNTIL messages', () => {
+    const expected = RATE * RUN_UNTIL;
+
+    expect(Math.abs(sendTimes(runPoisson()).length - expected)).toBeLessThan(expected * TOLERANCE);
+  });
+
+  it('should space arrivals by about 1 / RATE on average', () => {
+    const times = sendTimes(runPoisson());
+    const gaps = times.slice(1).map((time, idx) => time - times[idx]);
+    const meanGap = gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length;
+
+    expect(Math.abs(meanGap - 1 / RATE)).toBeLessThan(TOLERANCE / RATE);
+  });
+
+  it('should pick destinations uniformly among the other workstations, never the source', () => {
+    const sent = ofKind(runPoisson().trace, SIMULATION_EVENT_KIND.MESSAGE_SENT);
+    const toB = sent.filter(({ data }) => data.destination.label === 'B').length;
+    const toC = sent.filter(({ data }) => data.destination.label === 'C').length;
+
+    expect(sent.some(({ data }) => data.destination === data.source)).toBe(false);
+    expect(toB + toC).toBe(sent.length);
+    expect(Math.abs(toB - toC)).toBeLessThan(sent.length * TOLERANCE);
   });
 });

@@ -10,6 +10,7 @@ import {
 import { PriorityQueue } from '@/modules/util/PriorityQueue/PriorityQueue';
 import { StatefulNetwork } from '@/modules/simulation/state/StatefulNetwork';
 import { handleMessageSent } from '@/modules/simulation/events/handlers/handleMessageSent';
+import { pollTrafficGenerator } from '@/modules/simulation/events/handlers/pollTrafficGenerator';
 import { handleMessageReceived } from '@/modules/simulation/events/handlers/handleMessageReceived';
 import { handlePacketSent } from '@/modules/simulation/events/handlers/handlePacketSent';
 import { handlePacketReceived } from '@/modules/simulation/events/handlers/handlePacketReceived';
@@ -25,22 +26,18 @@ import {
   PacketFactory,
   type PacketFactoryConfig,
 } from '@/modules/traffic/PacketFactory';
-import type { Message } from '@/modules/traffic/Message';
+import { MessageFactory } from '@/modules/traffic/MessageFactory';
 import { Random } from 'random';
-
-interface TrafficDTO {
-  message: Message;
-  sourceId: number;
-  destinationId: number;
-  time: number;
-}
+import type { TrafficConfig } from '@/modules/traffic/generator/generator.typedefs';
+import type { TrafficGenerator } from '@/modules/traffic/generator/TrafficGenerator';
+import { makeTrafficGenerator } from '@/modules/traffic/generator/makeTrafficGenerator';
 
 export interface SimulationConfig {
   seed: number;
   network: Network;
   packets: PacketFactoryConfig;
-  routingPolicy: RoutingPolicy;
-  traffic: TrafficDTO[];
+  routing: RoutingPolicy;
+  traffic: TrafficConfig;
 }
 
 export class Simulation {
@@ -52,11 +49,16 @@ export class Simulation {
 
   readonly network: StatefulNetwork;
   readonly routing: RoutingPolicy;
+  readonly generators: TrafficGenerator[];
+
+  readonly messages: MessageFactory;
   readonly packets: PacketFactory;
+
+  readonly seed: number;
   readonly random: Random;
 
   private handlersByEventKind: { [K in SimulationEventKind]: SimulationEventHandler<K>[] } = {
-    [SIMULATION_EVENT_KIND.MESSAGE_SENT]: [handleMessageSent],
+    [SIMULATION_EVENT_KIND.MESSAGE_SENT]: [handleMessageSent, pollTrafficGenerator],
     [SIMULATION_EVENT_KIND.MESSAGE_RECEIVED]: [handleMessageReceived],
 
     [SIMULATION_EVENT_KIND.PACKET_SENT]: [handlePacketSent],
@@ -72,23 +74,22 @@ export class Simulation {
   };
 
   constructor(config: SimulationConfig) {
+    this.seed = config.seed;
     this.random = new Random(config.seed);
     this.network = new StatefulNetwork(config.network);
-    this.routing = config.routingPolicy;
-
+    this.routing = config.routing;
+    this.messages = new MessageFactory();
     this.packets = new PacketFactory(config.packets);
 
-    for (const item of config.traffic) {
-      this.schedule({
-        kind: SIMULATION_EVENT_KIND.MESSAGE_SENT,
-        data: {
-          message: item.message,
-          source: this.network.getWorkstation(item.sourceId),
-          destination: this.network.getWorkstation(item.destinationId),
-        },
-        eta: item.time,
-      });
+    this.generators = config.traffic.generators.map(makeTrafficGenerator(this));
+
+    for (const generator of this.generators) {
+      this.scheduleTransmission(generator);
     }
+  }
+
+  get pendingEvents(): readonly SimulationEvent[] {
+    return this.events.toArray();
   }
 
   get pendingEventCount() {
@@ -132,5 +133,24 @@ export class Simulation {
         serial: this.eventsSerial.next(),
       }));
     }
+  }
+
+  scheduleTransmission(generator: TrafficGenerator): void {
+    const transmission = generator.next();
+
+    if (!transmission) {
+      return;
+    }
+
+    this.schedule({
+      kind: SIMULATION_EVENT_KIND.MESSAGE_SENT,
+      data: {
+        source: this.network.getNode(generator.sourceId),
+        destination: this.network.getNode(transmission.destinationId),
+        message: this.messages.fromTransmission(transmission),
+        generator,
+      },
+      eta: transmission.time - this.clock,
+    });
   }
 }

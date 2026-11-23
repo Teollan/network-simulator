@@ -3,7 +3,7 @@ import {
   getLinkComplement,
   isLinkWith,
 } from '@/modules/network/network.helpers';
-import { NODE_TYPE } from '@/modules/network/node/Node.constants';
+import { isWorkstation } from '@/modules/network/node/Node.helpers';
 import {
   makeStatefulLink,
   type IsBusy,
@@ -50,11 +50,15 @@ export class StatefulNetwork {
   getWorkstation(id: number): StatefulNode {
     const node = this.getNode(id);
 
-    if (node.type !== NODE_TYPE.WORKSTATION) {
+    if (!isWorkstation(node)) {
       throw Error(`Node with id [${id}] is not a WORKSTATION`);
     }
 
     return node;
+  }
+
+  getWorkstations(): StatefulNode[] {
+    return this.nodes.filter(isWorkstation);
   }
 
   getLinksWith(nodeId: number) {

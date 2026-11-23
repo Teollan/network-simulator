@@ -2,6 +2,7 @@ import type { Frame } from '@/modules/traffic/Frame';
 import type { Message } from '@/modules/traffic/Message';
 import type { Packet } from '@/modules/traffic/Packet';
 import type { StatefulNode } from '@/modules/simulation/state/StatefulNode';
+import type { TrafficGenerator } from '@/modules/traffic/generator/TrafficGenerator';
 
 export const SIMULATION_EVENT_KIND = {
   MESSAGE_SENT: 'message::sent',
@@ -34,6 +35,7 @@ export type SimulationEventData<K extends SimulationEventKind> = {
     source: StatefulNode;
     destination: StatefulNode;
     message: Message;
+    generator?: TrafficGenerator;
   };
   [SIMULATION_EVENT_KIND.MESSAGE_RECEIVED]: {
     thisNode: StatefulNode;
