@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
-import { NODE_TYPE } from '@/modules/network/node/Node.constants';
 import { createRoutingPolicy } from '@/modules/routing/createRoutingPolicy';
 import { ROUTING_POLICY } from '@/modules/routing/routing.constants';
 import { Simulation } from '@/modules/simulation/Simulation';
@@ -14,6 +13,8 @@ import { getRandomSeed } from '@/modules/random/getRandomSeed';
 import { summarizeTrace } from '@/modules/simulation/summarizeTrace';
 import { useNetworkStore } from '@/stores/useNetworkStore';
 import { useTraceStore } from '@/stores/useTraceStore';
+import { useTrafficStore } from '@/stores/useTrafficStore';
+import { pick } from '@/modules/util/functional';
 
 interface SimulationStore {
   simulationConfig: SimulationConfig;
@@ -52,13 +53,7 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
       maxPacketSize,
       maxHops,
     } = get().simulationConfig;
-    const workstations = network.getNodes({ type: NODE_TYPE.WORKSTATION });
-    const source = workstations.at(0);
-    const destination = workstations.at(-1);
-
-    if (!source || !destination) {
-      return;
-    }
+    const { generators } = useTrafficStore.getState();
 
     const simulation = new Simulation({
       seed,
@@ -69,15 +64,7 @@ export const useSimulationStore = create<SimulationStore>()((set, get) => ({
         maxHops,
       },
       traffic: {
-        generators: [{
-          kind: 'scripted',
-          sourceId: source.id,
-          transmissions: [{
-            time: 0,
-            destinationId: destination.id,
-            size: 30,
-          }],
-        }],
+        generators: generators.map(pick('config')),
       },
     });
 

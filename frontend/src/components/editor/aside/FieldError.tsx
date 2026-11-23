@@ -2,7 +2,7 @@ import type { FieldError as FormFieldError } from 'react-hook-form';
 
 interface FieldErrorProps {
   id: string;
-  error?: FormFieldError;
+  error?: Pick<FormFieldError, 'message'>;
 }
 
 export const FieldError = ({

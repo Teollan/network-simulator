@@ -6,6 +6,7 @@ import {
   type LayoutPositions,
 } from '@/modules/layout/layoutNetwork';
 import { useTraceStore } from '@/stores/useTraceStore';
+import { useTrafficStore } from '@/stores/useTrafficStore';
 import { TopologyBuilder } from '@/modules/network/builder/TopologyBuilder';
 import type { TopologySpec } from '@/modules/network/builder/TopologySpec';
 import { getRandomSeed } from '@/modules/random/getRandomSeed';
@@ -64,6 +65,7 @@ export const useNetworkStore = create<NetworkStore>()((set, get) => ({
       });
 
       useTraceStore.getState().clearEvents();
+      useTrafficStore.getState().pruneGenerators(network);
     } catch (error) {
       console.error('Network generation failed', error);
 

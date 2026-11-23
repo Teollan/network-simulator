@@ -2,6 +2,7 @@ import { ASIDE_TAB } from '@/components/editor/aside/aside.constants';
 import { NetworkTab } from '@/components/editor/aside/tabs/NetworkTab';
 import { SimulationTab } from '@/components/editor/aside/tabs/SimulationTab';
 import { TraceTab } from '@/components/editor/aside/tabs/TraceTab';
+import { TrafficTab } from '@/components/editor/aside/tabs/TrafficTab';
 import {
   Tabs,
   TabsContent,
@@ -25,6 +26,10 @@ export const Aside = () => (
             Simulation
           </TabsTrigger>
 
+          <TabsTrigger value={ASIDE_TAB.TRAFFIC}>
+            Traffic
+          </TabsTrigger>
+
           <TabsTrigger value={ASIDE_TAB.TRACE}>
             Trace
           </TabsTrigger>
@@ -43,6 +48,13 @@ export const Aside = () => (
         className="overflow-y-auto p-4"
       >
         <SimulationTab />
+      </TabsContent>
+
+      <TabsContent
+        value={ASIDE_TAB.TRAFFIC}
+        className="overflow-y-auto p-4"
+      >
+        <TrafficTab />
       </TabsContent>
 
       <TabsContent

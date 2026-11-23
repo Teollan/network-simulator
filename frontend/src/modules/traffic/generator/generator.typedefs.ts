@@ -18,6 +18,8 @@ export type TrafficGeneratorConfig = TrafficGeneratorConfigBase & (
   }
 );
 
+export type TrafficGeneratorKind = TrafficGeneratorConfig['kind'];
+
 interface TrafficGeneratorConfigBase {
   sourceId: number;
 }
