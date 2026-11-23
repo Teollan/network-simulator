@@ -1,5 +1,5 @@
 export const ASIDE_TAB = {
-  NETWORK: 'network',
+  TOPOLOGY: 'topology',
   TRAFFIC: 'traffic',
   SIMULATION: 'simulation',
   TRACE: 'trace',

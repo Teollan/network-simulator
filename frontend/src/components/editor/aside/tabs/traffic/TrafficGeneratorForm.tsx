@@ -11,7 +11,7 @@ import {
 } from 'react-hook-form';
 import { z } from 'zod';
 import { FieldError } from '@/components/editor/aside/FieldError';
-import { NumberField } from '@/components/editor/aside/tabs/traffic/NumberField';
+import { NumberField } from '@/components/ui/form/NumberField';
 import {
   DEFAULT_MESSAGE_SIZE,
   TRAFFIC_GENERATOR_KIND_LABEL,

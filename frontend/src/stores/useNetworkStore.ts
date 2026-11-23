@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { toast } from 'sonner';
 import type { Network } from '@/modules/network/Network';
 import { DEFAULT_TOPOLOGY_SPEC } from '@/modules/network/network.constants';
 import {
@@ -8,7 +9,10 @@ import {
 import { useTraceStore } from '@/stores/useTraceStore';
 import { useTrafficStore } from '@/stores/useTrafficStore';
 import { TopologyBuilder } from '@/modules/network/builder/TopologyBuilder';
-import type { TopologySpec } from '@/modules/network/builder/TopologySpec';
+import type {
+  TopologyBuilderAction,
+  TopologySpec,
+} from '@/modules/network/builder/TopologySpec';
 import { getRandomSeed } from '@/modules/random/getRandomSeed';
 
 interface NetworkLayout {
@@ -23,6 +27,11 @@ interface NetworkStore {
   isGenerating: boolean;
 
   setSpec: (spec: Partial<TopologySpec>) => void;
+  addAction: (action: TopologyBuilderAction) => void;
+  updateAction: (idx: number, action: TopologyBuilderAction) => void;
+  removeAction: (idx: number) => void;
+  moveAction: (idx: number, offset: number) => void;
+  resetActions: () => void;
   generateNetwork: () => Promise<void>;
 }
 
@@ -35,6 +44,53 @@ export const useNetworkStore = create<NetworkStore>()((set, get) => ({
     spec: {
       ...state.spec,
       ...spec,
+    },
+  })),
+
+  addAction: (action) => set(({ spec }) => ({
+    spec: {
+      ...spec,
+      actions: [...spec.actions, action],
+    },
+  })),
+
+  updateAction: (idx, action) => set(({ spec }) => ({
+    spec: {
+      ...spec,
+      actions: spec.actions.with(idx, action),
+    },
+  })),
+
+  removeAction: (idx) => set(({ spec }) => ({
+    spec: {
+      ...spec,
+      actions: spec.actions.toSpliced(idx, 1),
+    },
+  })),
+
+  moveAction: (idx, offset) => set(({ spec }) => {
+    const target = idx + offset;
+
+    if (target < 0 || target >= spec.actions.length) {
+      return {};
+    }
+
+    const actions = [...spec.actions];
+
+    [actions[idx], actions[target]] = [actions[target], actions[idx]];
+
+    return {
+      spec: {
+        ...spec,
+        actions,
+      },
+    };
+  }),
+
+  resetActions: () => set(({ spec }) => ({
+    spec: {
+      ...spec,
+      actions: DEFAULT_TOPOLOGY_SPEC.actions,
     },
   })),
 
@@ -68,6 +124,10 @@ export const useNetworkStore = create<NetworkStore>()((set, get) => ({
       useTrafficStore.getState().pruneGenerators(network);
     } catch (error) {
       console.error('Network generation failed', error);
+
+      toast.error('Topology generation failed', {
+        description: error instanceof Error ? error.message : String(error),
+      });
 
       set({ isGenerating: false });
     }

@@ -1,6 +1,6 @@
 import { ASIDE_TAB } from '@/components/editor/aside/aside.constants';
-import { NetworkTab } from '@/components/editor/aside/tabs/NetworkTab';
 import { SimulationTab } from '@/components/editor/aside/tabs/SimulationTab';
+import { TopologyTab } from '@/components/editor/aside/tabs/TopologyTab';
 import { TraceTab } from '@/components/editor/aside/tabs/TraceTab';
 import { TrafficTab } from '@/components/editor/aside/tabs/TrafficTab';
 import {
@@ -13,13 +13,13 @@ import {
 export const Aside = () => (
   <aside className="flex h-full flex-col bg-background">
     <Tabs
-      defaultValue={ASIDE_TAB.NETWORK}
+      defaultValue={ASIDE_TAB.TOPOLOGY}
       className="h-full gap-0"
     >
       <div className="border-b p-2">
         <TabsList className="w-full">
-          <TabsTrigger value={ASIDE_TAB.NETWORK}>
-            Network
+          <TabsTrigger value={ASIDE_TAB.TOPOLOGY}>
+            Topology
           </TabsTrigger>
 
           <TabsTrigger value={ASIDE_TAB.SIMULATION}>
@@ -37,10 +37,10 @@ export const Aside = () => (
       </div>
 
       <TabsContent
-        value={ASIDE_TAB.NETWORK}
+        value={ASIDE_TAB.TOPOLOGY}
         className="overflow-y-auto p-4"
       >
-        <NetworkTab />
+        <TopologyTab />
       </TabsContent>
 
       <TabsContent
