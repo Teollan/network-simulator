@@ -11,6 +11,7 @@ import {
   Radio,
   Route,
   Send,
+  Zap,
   type LucideIcon,
 } from 'lucide-react';
 import {
@@ -113,6 +114,16 @@ export const describeEvent = (
       return {
         icon: ArrowRight,
         title: `packet #${packet.id} arrived ${getLabel(source.id)} → ${getLabel(destination.id)}`,
+      };
+    }
+
+    case SIMULATION_EVENT_KIND.BITS_CORRUPTED: {
+      const { packet, source, destination } = event.data.frame;
+
+      return {
+        icon: Zap,
+        title: `packet #${packet.id} corrupted ${getLabel(source.id)} → ${getLabel(destination.id)}`,
+        isError: true,
       };
     }
 

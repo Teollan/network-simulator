@@ -14,6 +14,14 @@ export function handleFrameSent(
 ) {
   const { frame } = event.data;
 
+  if (simulation.gremlin.rollForCorruption(frame)) {
+    simulation.schedule({
+      kind: SIMULATION_EVENT_KIND.BITS_CORRUPTED,
+      data: { frame },
+      eta: simulation.gremlin.pickWaitTime(GROUND_PROPAGATION_DELAY),
+    });
+  }
+
   simulation.schedule({
     kind: SIMULATION_EVENT_KIND.FRAME_RECEIVED,
     data: { frame },

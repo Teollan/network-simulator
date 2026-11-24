@@ -41,6 +41,7 @@ export function handlePacketSent(
     source: thisNode,
     destination,
     packet,
+    isCorrupted: false,
   }));
 
   for (const frame of frames) {

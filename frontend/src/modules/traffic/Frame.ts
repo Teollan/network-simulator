@@ -5,4 +5,5 @@ export interface Frame {
   packet: Packet;
   source: StatefulNode;
   destination: StatefulNode;
+  isCorrupted: boolean;
 }

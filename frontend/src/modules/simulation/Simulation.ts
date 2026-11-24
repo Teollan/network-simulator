@@ -31,6 +31,8 @@ import { Random } from 'random';
 import type { TrafficConfig } from '@/modules/traffic/generator/generator.typedefs';
 import type { TrafficGenerator } from '@/modules/traffic/generator/TrafficGenerator';
 import { makeTrafficGenerator } from '@/modules/traffic/generator/makeTrafficGenerator';
+import { Gremlin } from '@/modules/gremlin/Gremlin';
+import { handleBitsCorrupted } from '@/modules/simulation/events/handlers/handleBitsCorrupted';
 
 export interface SimulationConfig {
   seed: number;
@@ -50,6 +52,7 @@ export class Simulation {
   readonly network: StatefulNetwork;
   readonly routing: RoutingPolicy;
   readonly generators: TrafficGenerator[];
+  readonly gremlin: Gremlin;
 
   readonly messages: MessageFactory;
   readonly packets: PacketFactory;
@@ -71,17 +74,21 @@ export class Simulation {
 
     [SIMULATION_EVENT_KIND.LINK_ACQUIRED]: [handleLinkAcquired],
     [SIMULATION_EVENT_KIND.LINK_RELEASED]: [handleLinkReleased],
+    [SIMULATION_EVENT_KIND.BITS_CORRUPTED]: [handleBitsCorrupted],
   };
 
   constructor(config: SimulationConfig) {
     this.seed = config.seed;
     this.random = new Random(config.seed);
+
     this.network = new StatefulNetwork(config.network);
     this.routing = config.routing;
+    this.generators = config.traffic.generators.map(makeTrafficGenerator(this));
+    this.gremlin = new Gremlin(config.seed);
+
     this.messages = new MessageFactory();
     this.packets = new PacketFactory(config.packets);
 
-    this.generators = config.traffic.generators.map(makeTrafficGenerator(this));
 
     for (const generator of this.generators) {
       this.scheduleTransmission(generator);

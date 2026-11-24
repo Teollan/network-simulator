@@ -1,4 +1,5 @@
 import {
+  PACKET_DROP_REASON,
   SIMULATION_EVENT_KIND,
   type SimulationEvent,
 } from '@/modules/simulation/events/SimulationEvent';
@@ -20,6 +21,20 @@ export function handleFrameReceived(
     },
     eta: 0,
   });
+
+  if (frame.isCorrupted) {
+    simulation.schedule({
+      kind: SIMULATION_EVENT_KIND.PACKET_DROPPED,
+      data: {
+        packet: frame.packet,
+        thisNode: frame.destination,
+        reason: PACKET_DROP_REASON.CORRUPTED,
+      },
+      eta: 0,
+    });
+
+    return;
+  }
 
   simulation.schedule({
     kind: SIMULATION_EVENT_KIND.PACKET_RECEIVED,

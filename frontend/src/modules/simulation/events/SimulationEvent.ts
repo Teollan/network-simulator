@@ -18,6 +18,7 @@ export const SIMULATION_EVENT_KIND = {
 
   LINK_ACQUIRED: 'link::acquired',
   LINK_RELEASED: 'link::released',
+  BITS_CORRUPTED: 'bits::corrupted',
 } as const;
 
 export type SimulationEventKind = typeof SIMULATION_EVENT_KIND[keyof typeof SIMULATION_EVENT_KIND];
@@ -26,6 +27,7 @@ export const PACKET_DROP_REASON = {
   HOP_LIMIT: 'hop-limit',
   NO_ROUTE: 'no-route',
   BUFFER_OVERFLOW: 'buffer-overflow',
+  CORRUPTED: 'corrupted',
 } as const;
 
 export type PacketDropReason = typeof PACKET_DROP_REASON[keyof typeof PACKET_DROP_REASON];
@@ -76,6 +78,9 @@ export type SimulationEventData<K extends SimulationEventKind> = {
     source: StatefulNode;
     destination: StatefulNode;
   };
+  [SIMULATION_EVENT_KIND.BITS_CORRUPTED]: {
+    frame: Frame
+  }
 }[K];
 
 export type SimulationEvent<K extends SimulationEventKind = SimulationEventKind> = {
