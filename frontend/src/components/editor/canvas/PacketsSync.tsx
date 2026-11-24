@@ -33,9 +33,10 @@ export const PacketsSync = ({ setEdges }: PacketsSyncProps) => {
         return edge;
       }
 
-      const packets = framesInFlight.map<EdgePacket>(({ frame, progress }) => ({
+      const packets = framesInFlight.map<EdgePacket>(({ frame, progress, isCorrupted }) => ({
         id: frame.packet.id,
         progress: frame.source.id === Number(edge.source) ? progress : 1 - progress,
+        isCorrupted,
       }));
 
       return {

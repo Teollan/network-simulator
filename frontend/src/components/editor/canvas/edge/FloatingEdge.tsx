@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import {
   getStraightPath,
   useInternalNode,
@@ -48,10 +49,10 @@ function FloatingEdge({
         style={style}
       />
 
-      {data?.packets?.map(({ id: packetId, progress }) => (
+      {data?.packets?.map(({ id: packetId, progress, isCorrupted }) => (
         <circle
           key={packetId}
-          className="fill-green-500 stroke-background"
+          className={cn('stroke-background', isCorrupted ? 'fill-destructive' : 'fill-green-500')}
           cx={start.x + (end.x - start.x) * progress}
           cy={start.y + (end.y - start.y) * progress}
           r={PACKET_RADIUS}

@@ -9,6 +9,7 @@ import { notNull } from '@/modules/util/functional';
 export interface FrameInFlight {
   frame: Frame;
   progress: number; // 0 to 1
+  isCorrupted: boolean;
 }
 
 export interface Snapshot {
@@ -23,6 +24,7 @@ type FrameEventPair = readonly [
 export class Timeline {
   private trace: SimulationEvent[];
   private frameEventPairs: FrameEventPair[];
+  private corruptionTimeByFrame: Map<Frame, number>;
 
   constructor(trace: SimulationEvent[]) {
     this.trace = trace;
@@ -41,6 +43,12 @@ export class Timeline {
 
       return [sentEvent, receivedEvent] as const;
     }).filter(notNull);
+
+    this.corruptionTimeByFrame = new Map(
+      this.trace
+        .filter(isEventOfKind(SIMULATION_EVENT_KIND.BITS_CORRUPTED))
+        .map((event) => [event.data.frame, event.time]),
+    );
   }
 
   snapshotAt(time: number): Snapshot {
@@ -66,10 +74,12 @@ export class Timeline {
       }
 
       const progress = (time - sentEvent.time) / (receivedEvent.time - sentEvent.time);
+      const corruptionTime = this.corruptionTimeByFrame.get(frame);
 
       acc.get(link.id)!.push({
         frame,
         progress,
+        isCorrupted: corruptionTime !== undefined && corruptionTime <= time,
       });
 
       return acc;

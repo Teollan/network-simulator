@@ -4,6 +4,7 @@ export interface EdgePacket {
   id: number;
   // 0 to 1 from the edge source to the edge target, already flipped for reverse frames
   progress: number;
+  isCorrupted: boolean;
 }
 
 // React Flow requires edge data to be a Record<string, unknown>,
