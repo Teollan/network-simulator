@@ -1,3 +1,4 @@
+import { LINK_MEDIUM } from '@/modules/network/Link';
 import {
   TOPOLOGY_BUILDER_ACTION as ACTION,
   type TopologySpec,
@@ -8,6 +9,11 @@ export const DEFAULT_ROUTERS_PER_REGION = 9;
 export const DEFAULT_CONNECTIVITY_DEGREE = 3.5;
 export const DEFAULT_WORKSTATION_INTERVAL = 3;
 export const DEFAULT_HALF_DUPLEX_SHARE = 0.25;
+
+// Default BER is higher than real links (fiber ~1e-12, satellite ~1e-7) so that corruption shows up
+// with the small default frames: a 10-byte frame is lost with P ~ 0.008% on ground, ~0.8% via satellite
+export const DEFAULT_GROUND_BIT_ERROR_RATE = 1e-6;
+export const DEFAULT_SATELLITE_BIT_ERROR_RATE = 1e-4;
 
 export const DEFAULT_TOPOLOGY_SPEC: TopologySpec = {
   actions: [
@@ -107,11 +113,18 @@ export const DEFAULT_TOPOLOGY_SPEC: TopologySpec = {
         halfDuplexShare: DEFAULT_HALF_DUPLEX_SHARE,
       },
     },
-    // TODO: add proper default BERs
     {
       kind: ACTION.ASSIGN_BIT_ERROR_RATE,
       options: {
-        value: 0,
+        value: DEFAULT_GROUND_BIT_ERROR_RATE,
+        medium: LINK_MEDIUM.GROUND,
+      },
+    },
+    {
+      kind: ACTION.ASSIGN_BIT_ERROR_RATE,
+      options: {
+        value: DEFAULT_SATELLITE_BIT_ERROR_RATE,
+        medium: LINK_MEDIUM.SATELLITE,
       },
     },
   ],

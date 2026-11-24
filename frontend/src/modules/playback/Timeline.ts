@@ -30,12 +30,14 @@ export class Timeline {
     this.trace = trace;
 
     const sentEvents = this.trace.filter(isEventOfKind(SIMULATION_EVENT_KIND.FRAME_SENT));
-    const receivedEvents = this.trace.filter(isEventOfKind(SIMULATION_EVENT_KIND.FRAME_RECEIVED));
+    const receivedEventByFrame = new Map(
+      this.trace
+        .filter(isEventOfKind(SIMULATION_EVENT_KIND.FRAME_RECEIVED))
+        .map((event) => [event.data.frame, event]),
+    );
 
     this.frameEventPairs = sentEvents.map((sentEvent) => {
-      const receivedEvent = receivedEvents.find((event) => (
-        event.data.frame === sentEvent.data.frame
-      ));
+      const receivedEvent = receivedEventByFrame.get(sentEvent.data.frame);
 
       if (!receivedEvent) {
         return null;
